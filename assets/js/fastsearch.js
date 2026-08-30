@@ -1,17 +1,13 @@
 import * as params from '@params';
 
-let fuse; // holds our search engine
+let fuse;
 let resList = document.getElementById('searchResults');
 let sInput = document.getElementById('searchInput');
 let first, last, current_elem = null
 let resultsAvailable = false;
 
-// 从 summary(可能含 HTML) 或 content(纯文本) 生成一段去标签、压缩空白的摘要片段
-function makeSnippet(item) {
-    let raw = item.summary || item.content || '';
-    // 去掉 HTML 标签（summary 字段是 Hugo 的 .Summary，可能带 <p> 等）
+function stripHtml(raw) {
     let text = String(raw).replace(/<[^>]*>/g, ' ');
-    // 解码常见实体
     text = text
         .replace(/&nbsp;/g, ' ')
         .replace(/&amp;/g, '&')
@@ -19,13 +15,7 @@ function makeSnippet(item) {
         .replace(/&gt;/g, '>')
         .replace(/&quot;/g, '"')
         .replace(/&#39;/g, "'");
-    // 压缩空白
-    text = text.replace(/\s+/g, ' ').trim();
-    const MAX = 160;
-    if (text.length > MAX) {
-        text = text.slice(0, MAX).trim() + '…';
-    }
-    return text;
+    return text.replace(/\s+/g, ' ').trim();
 }
 
 function escapeHtml(s) {
@@ -36,7 +26,123 @@ function escapeHtml(s) {
         .replace(/"/g, '&quot;');
 }
 
-// load our search index
+function makeSnippet(item, matches) {
+    let raw = item.content || item.summary || '';
+    let text = stripHtml(raw);
+    if (!text) return { snippet: '', highlightRanges: [] };
+
+    const CONTEXT = 80;
+    const MAX = 200;
+
+    let contentMatches = [];
+    if (matches) {
+        contentMatches = matches.filter(m => m.key === 'content' || m.key === 'summary');
+    }
+
+    let center = 0;
+    if (contentMatches.length > 0) {
+        let allIndices = [];
+        for (let m of contentMatches) {
+            if (m.indices) {
+                for (let [start, end] of m.indices) {
+                    allIndices.push(start);
+                }
+            }
+        }
+        if (allIndices.length > 0) {
+            allIndices.sort((a, b) => a - b);
+            center = allIndices[0];
+        }
+    }
+
+    let snippetStart = Math.max(0, center - CONTEXT);
+    let snippetEnd = Math.min(text.length, snippetStart + MAX);
+    snippetStart = Math.max(0, snippetEnd - MAX);
+
+    let snippet = text.slice(snippetStart, snippetEnd);
+
+    let highlightRanges = [];
+    if (contentMatches.length > 0) {
+        let allIndices = [];
+        for (let m of contentMatches) {
+            if (m.indices) {
+                for (let [start, end] of m.indices) {
+                    if (end >= snippetStart && start <= snippetEnd) {
+                        let lo = Math.max(start, snippetStart) - snippetStart;
+                        let hi = Math.min(end + 1, snippetEnd) - snippetStart;
+                        allIndices.push([lo, hi]);
+                    }
+                }
+            }
+        }
+        allIndices.sort((a, b) => a[0] - b[0]);
+        highlightRanges = mergeRanges(allIndices);
+    }
+
+    let prefix = snippetStart > 0 ? '…' : '';
+    let suffix = snippetEnd < text.length ? '…' : '';
+
+    return { snippet: prefix + snippet + suffix, highlightRanges, offset: snippetStart, prefixLen: prefix.length };
+}
+
+function mergeRanges(ranges) {
+    if (ranges.length === 0) return [];
+    let merged = [ranges[0]];
+    for (let i = 1; i < ranges.length; i++) {
+        let last = merged[merged.length - 1];
+        if (ranges[i][0] <= last[1]) {
+            last[1] = Math.max(last[1], ranges[i][1]);
+        } else {
+            merged.push(ranges[i]);
+        }
+    }
+    return merged;
+}
+
+function renderSnippetWithHighlight(snippet, highlightRanges, prefixLen) {
+    if (highlightRanges.length === 0) {
+        return escapeHtml(snippet);
+    }
+
+    let adjustedRanges = highlightRanges.map(r => [r[0] + prefixLen, r[1] + prefixLen]);
+
+    let parts = [];
+    let cursor = 0;
+    for (let [start, end] of adjustedRanges) {
+        if (start > cursor) {
+            parts.push(escapeHtml(snippet.slice(cursor, start)));
+        }
+        parts.push('<mark>' + escapeHtml(snippet.slice(start, end)) + '</mark>');
+        cursor = end;
+    }
+    if (cursor < snippet.length) {
+        parts.push(escapeHtml(snippet.slice(cursor)));
+    }
+    return parts.join('');
+}
+
+function makeTitleHtml(title, matches) {
+    let titleMatches = matches ? matches.filter(m => m.key === 'title') : [];
+    if (titleMatches.length === 0 || !titleMatches[0].indices || titleMatches[0].indices.length === 0) {
+        return escapeHtml(title);
+    }
+
+    let ranges = mergeRanges(titleMatches[0].indices);
+    let parts = [];
+    let cursor = 0;
+    for (let [start, end] of ranges) {
+        if (start > cursor) {
+            parts.push(escapeHtml(title.slice(cursor, start)));
+        }
+        parts.push('<mark>' + escapeHtml(title.slice(start, end + 1)) + '</mark>');
+        cursor = end + 1;
+    }
+    if (cursor < title.length) {
+        parts.push(escapeHtml(title.slice(cursor)));
+    }
+    return parts.join('');
+}
+
 window.onload = function () {
     let xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {
@@ -44,11 +150,11 @@ window.onload = function () {
             if (xhr.status === 200) {
                 let data = JSON.parse(xhr.responseText);
                 if (data) {
-                    // fuse.js options; check fuse.js website for details
                     let options = {
                         distance: 100,
                         threshold: 0.4,
                         ignoreLocation: true,
+                        includeMatches: true,
                         keys: [
                             'title',
                             'permalink',
@@ -60,7 +166,7 @@ window.onload = function () {
                         options = {
                             isCaseSensitive: params.fuseOpts.iscasesensitive ?? false,
                             includeScore: params.fuseOpts.includescore ?? false,
-                            includeMatches: params.fuseOpts.includematches ?? false,
+                            includeMatches: params.fuseOpts.includematches ?? true,
                             minMatchCharLength: params.fuseOpts.minmatchcharlength ?? 1,
                             shouldSort: params.fuseOpts.shouldsort ?? true,
                             findAllMatches: params.fuseOpts.findallmatches ?? false,
@@ -71,7 +177,7 @@ window.onload = function () {
                             ignoreLocation: params.fuseOpts.ignorelocation ?? true
                         }
                     }
-                    fuse = new Fuse(data, options); // build the index from the json file
+                    fuse = new Fuse(data, options);
                 }
             } else {
                 console.log(xhr.responseText);
@@ -84,7 +190,6 @@ window.onload = function () {
 
 function activeToggle(ae) {
     document.querySelectorAll('.focus').forEach(function (element) {
-        // rm focus class
         element.classList.remove("focus")
     });
     if (ae) {
@@ -98,34 +203,40 @@ function activeToggle(ae) {
 
 function reset() {
     resultsAvailable = false;
-    resList.innerHTML = sInput.value = ''; // clear inputbox and searchResults
-    sInput.focus(); // shift focus to input box
+    resList.innerHTML = sInput.value = '';
+    sInput.focus();
 }
 
-// execute search as each character is typed
 sInput.onkeyup = function (e) {
-    // run a search query (for "term") every time a letter is typed
-    // in the search box
     if (fuse) {
         let results;
+        let query = this.value.trim();
+        if (!query) {
+            resultsAvailable = false;
+            resList.innerHTML = '';
+            return;
+        }
         if (params.fuseOpts) {
-            results = fuse.search(this.value.trim(), { limit: params.fuseOpts.limit }); // the actual query being run using fuse.js along with options
+            results = fuse.search(query, { limit: params.fuseOpts.limit });
         } else {
-            results = fuse.search(this.value.trim()); // the actual query being run using fuse.js
+            results = fuse.search(query);
         }
         if (results.length !== 0) {
-            // build our html if result exists
-            let resultSet = ''; // our results bucket
+            let resultSet = '';
 
             for (let item in results) {
-                const r = results[item].item;
-                const snippet = makeSnippet(r);
-                // 注意：保留 <a> 作为 <li> 的最后一个子节点，键盘上下/右导航依赖 lastChild
+                const r = results[item];
+                const ri = r.item;
+                const matches = r.matches;
+                const titleHtml = makeTitleHtml(ri.title, matches);
+                const { snippet, highlightRanges, prefixLen } = makeSnippet(ri, matches);
+                const snippetHtml = renderSnippetWithHighlight(snippet, highlightRanges, 0);
+
                 resultSet +=
                     `<li class="post-entry">` +
-                    `<header class="entry-header">${escapeHtml(r.title)}&nbsp;»</header>` +
-                    (snippet ? `<div class="search-snippet">${escapeHtml(snippet)}</div>` : '') +
-                    `<a href="${escapeHtml(r.permalink)}" aria-label="${escapeHtml(r.title)}"></a>` +
+                    `<header class="entry-header">${titleHtml}&nbsp;»</header>` +
+                    (snippetHtml ? `<div class="search-snippet">${snippetHtml}</div>` : '') +
+                    `<a href="${escapeHtml(ri.permalink)}" aria-label="${escapeHtml(ri.title)}"></a>` +
                     `</li>`;
             }
 
@@ -141,11 +252,9 @@ sInput.onkeyup = function (e) {
 }
 
 sInput.addEventListener('search', function (e) {
-    // clicked on x
     if (!this.value) reset()
 })
 
-// kb bindings
 document.onkeydown = function (e) {
     let key = e.key;
     let ae = document.activeElement;
@@ -166,24 +275,18 @@ document.onkeydown = function (e) {
     } else if (key === "ArrowDown") {
         e.preventDefault();
         if (ae == sInput) {
-            // if the currently focused element is the search input, focus the <a> of first <li>
             activeToggle(resList.firstChild.lastChild);
         } else if (ae.parentElement != last) {
-            // if the currently focused element's parent is last, do nothing
-            // otherwise select the next search result
             activeToggle(ae.parentElement.nextSibling.lastChild);
         }
     } else if (key === "ArrowUp") {
         e.preventDefault();
         if (ae.parentElement == first) {
-            // if the currently focused element is first item, go to input box
             activeToggle(sInput);
         } else if (ae != sInput) {
-            // if the currently focused element is input box, do nothing
-            // otherwise select the previous search result
             activeToggle(ae.parentElement.previousSibling.lastChild);
         }
     } else if (key === "ArrowRight") {
-        ae.click(); // click on active link
+        ae.click();
     }
 }
