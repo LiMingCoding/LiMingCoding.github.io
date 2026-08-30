@@ -1,0 +1,125 @@
+/* Series box: rendered at the bottom of any post that opts into a
+   series via front matter (see layouts/_partials/extend_post_content.html).
+   Visual language leans on the same chip/border tokens as the home
+   taxonomy cloud so the two related surfaces look like siblings. */
+
+.series-box {
+    margin-top: 2.5rem;
+    padding: 1rem 1.25rem;
+    background: var(--entry);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 0.92rem;
+}
+
+.series-box--solo {
+    /* Single-post series — no list to render, just the header chip */
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.series-box-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.4rem 0.6rem;
+    margin-bottom: 0.85rem;
+}
+
+.series-box--solo .series-box-header {
+    margin-bottom: 0;
+}
+
+.series-box-icon {
+    font-size: 1.05rem;
+    line-height: 1;
+}
+
+.series-box-label {
+    color: var(--secondary);
+    font-weight: 500;
+}
+
+.series-box-title {
+    font-weight: 600;
+    color: var(--primary);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.15s;
+}
+
+.series-box-title:hover {
+    border-bottom-color: var(--secondary);
+}
+
+.series-box-count {
+    color: var(--secondary);
+    font-size: 0.85em;
+}
+
+.series-box-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.series-box-item {
+    display: flex;
+    align-items: center;
+}
+
+.series-box-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.25rem 0.55rem;
+    border-radius: var(--radius);
+    color: var(--primary);
+    text-decoration: none;
+    transition: background-color 0.12s;
+    width: 100%;
+}
+
+.series-box-link:hover {
+    background: var(--tertiary);
+}
+
+.series-box-index,
+.series-box-marker {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.6em;
+    height: 1.6em;
+    padding: 0 0.3em;
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1;
+    background: var(--code-bg);
+    color: var(--secondary);
+    border-radius: 999px;
+    border: 1px solid var(--border);
+}
+
+.series-box-item--current .series-box-link {
+    background: var(--tertiary);
+    color: var(--primary);
+}
+
+.series-box-item--current .series-box-marker {
+    background: var(--primary);
+    color: var(--theme);
+    border-color: var(--primary);
+}
+
+.series-box-name {
+    /* keep titles on one line when reasonable */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

@@ -1,0 +1,64 @@
+{{- /*
+    Override of PaperMod's _partials/extend_post_content.html.
+
+    Renders a "系列文章" box at the bottom of any post that opts into
+    a series via front matter:
+
+        series:
+          - "Hugo折腾笔记"
+
+    The series itself is backed by Hugo's taxonomy machinery (configured
+    in hugo.yaml: `taxonomies: { category: categories, tag: tags,
+    series: series }`), so /series/<name>/ listing pages come for free
+    via PaperMod's taxonomy.html.
+
+    Inside the box we list every post in the series, sorted by date
+    (taxonomy's default ordering), and mark the current post with a
+    check so readers can see where they are in the sequence.
+*/}}
+
+{{- $seriesTerms := .GetTerms "series" }}
+{{- if $seriesTerms }}
+{{- range $seriesTerms }}
+{{- $seriesName := .LinkTitle }}
+{{- $seriesUrl := .RelPermalink }}
+{{- $seriesPages := .Pages.ByDate }}
+{{- $total := len $seriesPages }}
+
+{{- if eq $total 1 }}
+{{- /* Only one post in this series — link the name, no list. */}}
+<aside class="series-box series-box--solo" aria-label="系列文章">
+    <header class="series-box-header">
+        <span class="series-box-icon" aria-hidden="true">📚</span>
+        <span class="series-box-label">本文属于系列</span>
+        <a class="series-box-title" href="{{ $seriesUrl }}">{{ $seriesName }}</a>
+        <span class="series-box-count">（{{ $total }} 篇）</span>
+    </header>
+</aside>
+{{- else }}
+<aside class="series-box" aria-label="系列文章">
+    <header class="series-box-header">
+        <span class="series-box-icon" aria-hidden="true">📚</span>
+        <span class="series-box-label">本文属于系列</span>
+        <a class="series-box-title" href="{{ $seriesUrl }}">{{ $seriesName }}</a>
+        <span class="series-box-count">（{{ $total }} 篇）</span>
+    </header>
+    <ol class="series-box-list">
+        {{- range $i, $p := $seriesPages }}
+        <li class="series-box-item {{ if eq $p.RelPermalink $.RelPermalink }}series-box-item--current{{ end }}">
+            <a href="{{ $p.RelPermalink }}" class="series-box-link">
+                {{- if eq $p.RelPermalink $.RelPermalink }}
+                <span class="series-box-marker" aria-label="当前篇">✓</span>
+                {{- else }}
+                <span class="series-box-index" aria-hidden="true">{{ add $i 1 }}</span>
+                {{- end }}
+                <span class="series-box-name">{{ $p.LinkTitle }}</span>
+            </a>
+        </li>
+        {{- end }}
+    </ol>
+</aside>
+{{- end }}
+
+{{- end }}
+{{- end }}
