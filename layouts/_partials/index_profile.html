@@ -2,9 +2,9 @@
     Override of PaperMod's _partials/index_profile.html.
 
     Why: PaperMod's profile-mode home shows avatar + buttons and stops
-    there — no taxonomy entry points. We append a small "分类 / 标签"
+    there — no taxonomy entry points. We append a small "分类 / 标签 / 系列"
     chip cloud below the profile so visitors can browse content by topic
-    from the home page. /categories/ and /tags/ already render
+    from the home page. /categories/, /tags/ and /series/ already render
     correctly via PaperMod's taxonomy.html; we only link to them.
 
     Layout gotcha: PaperMod's .main .profile is `display: flex;
@@ -83,7 +83,8 @@
      .main .profile does not put us beside the avatar. */}}
 {{- $catTerms := site.Taxonomies.categories -}}
 {{- $tagTerms := site.Taxonomies.tags -}}
-{{- if or $catTerms $tagTerms }}
+{{- $seriesTerms := site.Taxonomies.series -}}
+{{- if or $catTerms $tagTerms $seriesTerms }}
 <div class="home-taxonomies">
     {{- if $catTerms }}
     <section class="home-taxonomies-section">
@@ -110,6 +111,23 @@
             {{- $display := $term.Page.LinkTitle | default $name }}
             <li>
                 <a class="home-taxonomy-chip" href="{{ $term.Page.RelPermalink }}" aria-label="标签 {{ $display }}，共 {{ $term.Count }} 篇">
+                    <span class="home-taxonomy-name">{{ $display }}</span>
+                    <span class="home-taxonomy-count">{{ $term.Count }}</span>
+                </a>
+            </li>
+            {{- end }}
+        </ul>
+    </section>
+    {{- end }}
+
+    {{- if $seriesTerms }}
+    <section class="home-taxonomies-section">
+        <h3 class="home-taxonomies-title">📚 系列</h3>
+        <ul class="home-taxonomies-list">
+            {{- range $name, $term := $seriesTerms }}
+            {{- $display := $term.Page.LinkTitle | default $name }}
+            <li>
+                <a class="home-taxonomy-chip" href="{{ $term.Page.RelPermalink }}" aria-label="系列 {{ $display }}，共 {{ $term.Count }} 篇">
                     <span class="home-taxonomy-name">{{ $display }}</span>
                     <span class="home-taxonomy-count">{{ $term.Count }}</span>
                 </a>
