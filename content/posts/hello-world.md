@@ -61,3 +61,9 @@ for i in range(10):
 ## 小结
 
 第一篇暂时写到这里。下一篇打算整理一下我常用的 Python 异步编程套路，欢迎催更。
+
+---
+
+## 相关阅读
+
+- [Hugo + PaperMod 博客搭建：从 0 到评论上线，我踩过的坑](/posts/hugo-blog-build-pitfalls/) — 下一篇，讲我搭这个博客本身踩的坑（giscus repoId 格式、调试 agent 冲突等）。

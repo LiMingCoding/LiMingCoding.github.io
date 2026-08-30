@@ -1,0 +1,81 @@
+/* Backlinks box — sits below the post body / series box.
+   Lists other posts whose rendered HTML contains a link to this one.
+   Visual language mirrors the series-box (same border, accent, radius). */
+
+.backlinks {
+    margin: 1.5rem 0 0;
+    padding: 0.85rem 1.1rem;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--secondary);
+    border-radius: var(--radius, 8px);
+    background: var(--entry);
+    font-size: 0.92em;
+}
+
+.backlinks-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.55rem;
+    font-weight: 600;
+    color: var(--secondary);
+    line-height: 1.2;
+}
+
+.backlinks-icon {
+    font-size: 1.05em;
+}
+
+.backlinks-title {
+    flex: 1;
+}
+
+.backlinks-count {
+    display: inline-block;
+    min-width: 1.6em;
+    padding: 0.05rem 0.5rem;
+    background: var(--secondary);
+    color: var(--theme);
+    border-radius: 999px;
+    font-size: 0.85em;
+    text-align: center;
+    line-height: 1.4;
+}
+
+.backlinks-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.backlinks-item {
+    padding: 0;
+    margin: 0;
+}
+
+.backlinks-link {
+    display: block;
+    padding: 0.3rem 0;
+    color: var(--primary);
+    text-decoration: none;
+    line-height: 1.4;
+    border-radius: 4px;
+    transition: color 0.15s ease;
+}
+
+.backlinks-link:hover {
+    color: var(--secondary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.backlinks-link-title {
+    /* nothing extra — kept as a hook in case we add a meta line later */
+}
+
+/* Dark theme: the secondary-on-theme pill may need a contrast tweak.
+   PaperMod already handles this via --secondary/--theme so nothing
+   to do here, but keep the class as an extension point. */

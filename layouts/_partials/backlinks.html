@@ -1,0 +1,50 @@
+{{- /*
+    Backlinks partial.
+
+    Renders a "📎 引用本文" box at the bottom of every post, listing
+    other posts whose rendered HTML contains a link to this one.
+
+    Strategy: iterate all posts in the `posts` section, check if their
+    rendered `.Content` contains `href="<current RelPermalink>"`.
+    O(N²) but fine for a small blog — at N=100 it's still well under a
+    millisecond per page.
+
+    Why `.Content` (rendered HTML) instead of `.RawContent` (markdown):
+    by the time Hugo has rendered, every internal link — whether it
+    was written as `[t]({{< ref "x.md" >}})`, `[t]({{< ref "x" >}})`,
+    `[t](/posts/x/)`, or even `[t](https://limingcoding.github.io/posts/x/)`
+    — is normalized into `<a href="/posts/x/">`. So we have a single
+    shape to search for, and we don't have to re-implement Hugo's
+    ref/relref resolver.
+*/}}
+
+{{- $current := . -}}
+{{- $currentRel := $current.RelPermalink -}}
+{{- $needle := printf `href="%s"` $currentRel -}}
+
+{{- $links := slice -}}
+{{- range where .Site.RegularPages "Section" "posts" -}}
+  {{- $other := . -}}
+  {{- if and (ne $other.RelPermalink $currentRel) (strings.Contains $other.Content $needle) -}}
+    {{- $links = $links | append $other -}}
+  {{- end -}}
+{{- end -}}
+
+{{- if $links -}}
+<aside class="backlinks" aria-label="Backlinks">
+  <header class="backlinks-header">
+    <span class="backlinks-icon" aria-hidden="true">🔗</span>
+    <span class="backlinks-title">引用本文</span>
+    <span class="backlinks-count">{{ len $links }}</span>
+  </header>
+  <ul class="backlinks-list">
+    {{- range $links }}
+    <li class="backlinks-item">
+      <a class="backlinks-link" href="{{ .RelPermalink }}">
+        <span class="backlinks-link-title">{{ .Title }}</span>
+      </a>
+    </li>
+    {{- end }}
+  </ul>
+</aside>
+{{- end -}}
