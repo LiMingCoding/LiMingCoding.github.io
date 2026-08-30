@@ -1,0 +1,11 @@
+{{- if and .IsPage (eq .Kind "page") (not (eq .Layout "archives")) -}}
+{{- $mermaidEnabled := or (.Params.mermaid) (.Site.Params.mermaid) -}}
+{{- if $mermaidEnabled -}}
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<script>
+    if (document.querySelector('div.mermaid')) {
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral', securityLevel: 'loose' });
+    }
+</script>
+{{- end -}}
+{{- end -}}

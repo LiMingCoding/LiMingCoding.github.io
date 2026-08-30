@@ -1,0 +1,13 @@
+{{- /*
+  Mermaid diagram shortcode.
+  Usage:
+    {{< mermaid >}}
+    graph TD
+        A[Start] --> B{Decision}
+        B -->|Yes| C[OK]
+        B -->|No| D[Cancel]
+    {{< /mermaid >}}
+*/ -}}
+<div class="mermaid{{ with .Get "class" }} {{ . }}{{ end }}">
+{{- .Inner | safeHTML -}}
+</div>
