@@ -26,25 +26,52 @@ function escapeHtml(s) {
         .replace(/"/g, '&quot;');
 }
 
-function makeSnippet(item, matches) {
+function escapeRegex(s) {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Locate every literal occurrence of any whitespace-separated token in
+// `query` inside `text` (case-insensitive). Returns sorted, merged
+// [start, end) character ranges — exclusive end so callers can slice
+// with text.slice(start, end) without an off-by-one.
+function findLiteralRanges(text, query) {
+    if (!query) return [];
+    let tokens = query.split(/\s+/).filter(t => t.length > 0);
+    if (tokens.length === 0) return [];
+    let ranges = [];
+    for (let token of tokens) {
+        let pattern = new RegExp(escapeRegex(token), 'gi');
+        let m;
+        while ((m = pattern.exec(text)) !== null) {
+            ranges.push([m.index, m.index + m[0].length]);
+        }
+    }
+    if (ranges.length === 0) return [];
+    ranges.sort((a, b) => a[0] - b[0]);
+    return mergeRanges(ranges);
+}
+
+function makeSnippet(item, query, matches) {
     let raw = item.content || item.summary || '';
     let text = stripHtml(raw);
-    if (!text) return { snippet: '', highlightRanges: [] };
+    if (!text) return { snippet: '' };
 
     const CONTEXT = 80;
     const MAX = 200;
 
-    let contentMatches = [];
-    if (matches) {
-        contentMatches = matches.filter(m => m.key === 'content' || m.key === 'summary');
-    }
-
+    // Center the snippet window on the first literal query occurrence
+    // (matches what the highlight will show). Fall back to Fuse's fuzzy
+    // match position when the query words are not literally present.
     let center = 0;
-    if (contentMatches.length > 0) {
+    let literal = findLiteralRanges(text, query);
+    if (literal.length > 0) {
+        center = literal[0][0];
+    } else if (matches) {
+        let contentMatches = matches.filter(m => m.key === 'content' || m.key === 'summary');
         let allIndices = [];
         for (let m of contentMatches) {
             if (m.indices) {
-                for (let [start, end] of m.indices) {
+                for (let [start] of m.indices) {
                     allIndices.push(start);
                 }
             }
@@ -61,28 +88,10 @@ function makeSnippet(item, matches) {
 
     let snippet = text.slice(snippetStart, snippetEnd);
 
-    let highlightRanges = [];
-    if (contentMatches.length > 0) {
-        let allIndices = [];
-        for (let m of contentMatches) {
-            if (m.indices) {
-                for (let [start, end] of m.indices) {
-                    if (end >= snippetStart && start <= snippetEnd) {
-                        let lo = Math.max(start, snippetStart) - snippetStart;
-                        let hi = Math.min(end + 1, snippetEnd) - snippetStart;
-                        allIndices.push([lo, hi]);
-                    }
-                }
-            }
-        }
-        allIndices.sort((a, b) => a[0] - b[0]);
-        highlightRanges = mergeRanges(allIndices);
-    }
-
     let prefix = snippetStart > 0 ? '…' : '';
     let suffix = snippetEnd < text.length ? '…' : '';
 
-    return { snippet: prefix + snippet + suffix, highlightRanges, offset: snippetStart, prefixLen: prefix.length };
+    return { snippet: prefix + snippet + suffix };
 }
 
 function mergeRanges(ranges) {
@@ -99,16 +108,15 @@ function mergeRanges(ranges) {
     return merged;
 }
 
-function renderSnippetWithHighlight(snippet, highlightRanges, prefixLen) {
-    if (highlightRanges.length === 0) {
+function renderSnippetWithHighlight(snippet, query) {
+    let ranges = findLiteralRanges(snippet, query);
+    if (ranges.length === 0) {
         return escapeHtml(snippet);
     }
 
-    let adjustedRanges = highlightRanges.map(r => [r[0] + prefixLen, r[1] + prefixLen]);
-
     let parts = [];
     let cursor = 0;
-    for (let [start, end] of adjustedRanges) {
+    for (let [start, end] of ranges) {
         if (start > cursor) {
             parts.push(escapeHtml(snippet.slice(cursor, start)));
         }
@@ -121,21 +129,20 @@ function renderSnippetWithHighlight(snippet, highlightRanges, prefixLen) {
     return parts.join('');
 }
 
-function makeTitleHtml(title, matches) {
-    let titleMatches = matches ? matches.filter(m => m.key === 'title') : [];
-    if (titleMatches.length === 0 || !titleMatches[0].indices || titleMatches[0].indices.length === 0) {
+function makeTitleHtml(title, query) {
+    let ranges = findLiteralRanges(title, query);
+    if (ranges.length === 0) {
         return escapeHtml(title);
     }
 
-    let ranges = mergeRanges(titleMatches[0].indices);
     let parts = [];
     let cursor = 0;
     for (let [start, end] of ranges) {
         if (start > cursor) {
             parts.push(escapeHtml(title.slice(cursor, start)));
         }
-        parts.push('<mark>' + escapeHtml(title.slice(start, end + 1)) + '</mark>');
-        cursor = end + 1;
+        parts.push('<mark>' + escapeHtml(title.slice(start, end)) + '</mark>');
+        cursor = end;
     }
     if (cursor < title.length) {
         parts.push(escapeHtml(title.slice(cursor)));
@@ -228,9 +235,9 @@ sInput.onkeyup = function (e) {
                 const r = results[item];
                 const ri = r.item;
                 const matches = r.matches;
-                const titleHtml = makeTitleHtml(ri.title, matches);
-                const { snippet, highlightRanges, prefixLen } = makeSnippet(ri, matches);
-                const snippetHtml = renderSnippetWithHighlight(snippet, highlightRanges, 0);
+                const titleHtml = makeTitleHtml(ri.title, query);
+                const { snippet } = makeSnippet(ri, query, matches);
+                const snippetHtml = renderSnippetWithHighlight(snippet, query);
 
                 resultSet +=
                     `<li class="post-entry">` +
