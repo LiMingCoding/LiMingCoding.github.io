@@ -10,6 +10,15 @@ defaultContentLanguage: zh-cn
 defaultContentLanguageInSubdir: false
 languageCode: zh-CN
 
+# ---------- Taxonomies ----------
+# Hugo 默认是 categories + tags；显式列出以保留默认并新增 series。
+# `series` 让任意 post 可以 front-matter 写 `series: [名名]` 即可归入
+# 一个系列——PaperMod 的 taxonomy.html 自动渲染 /series/<名名>/ 列表。
+taxonomies:
+  category: categories
+  tag: tags
+  series: series
+
 # ---------- PaperMod 主题参数 ----------
 params:
   env: production
