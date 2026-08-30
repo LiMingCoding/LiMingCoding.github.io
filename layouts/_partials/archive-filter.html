@@ -26,7 +26,7 @@
        sibling selector chain short. */ -}}
 <input type="radio" name="archive-cat" id="archive-cat-all" class="archive-radio" checked>
 {{- range $cats }}
-<input type="radio" name="archive-cat" id="archive-cat-{{ . | urlize }}" class="archive-radio">
+<input type="radio" name="archive-cat" id="archive-cat-{{ . }}" class="archive-radio">
 {{- end }}
 
 <input type="radio" name="archive-view" id="archive-view-detailed" class="archive-radio" checked>
@@ -36,8 +36,8 @@
   <div class="archive-cat-filter" role="group" aria-label="按分类筛选">
     <label for="archive-cat-all" class="archive-pill archive-pill--cat">全部</label>
     {{- range $cats }}
-    <label for="archive-cat-{{ . | urlize }}" class="archive-pill archive-pill--cat"
-           data-cat="{{ . | urlize }}">{{ . }}</label>
+    <label for="archive-cat-{{ . }}" class="archive-pill archive-pill--cat"
+           data-cat="{{ . }}">{{ . }}</label>
     {{- end }}
   </div>
 

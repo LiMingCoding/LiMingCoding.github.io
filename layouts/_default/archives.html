@@ -57,7 +57,7 @@
       {{- if eq .Kind "page" }}
       {{- $cat := "" }}
       {{- with .Params.categories }}{{ $cat = index . 0 }}{{ end }}
-      {{- $catSlug := default "uncategorized" ($cat | urlize) }}
+      {{- $catSlug := default "uncategorized" ($cat) }}
       <article class="archive-entry archive-entry--cat-{{ $catSlug }}"
                data-title="{{ .Title | plainify }}"
                data-excerpt="{{ .Summary | plainify }}"
