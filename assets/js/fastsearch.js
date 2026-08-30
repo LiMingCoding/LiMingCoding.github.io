@@ -160,6 +160,9 @@ function loadSearchIndex() {
         })
         .then(function (data) {
             if (!data) return;
+            // see themes/PaperMod/layouts/search.html:24 — input ships
+            // disabled to suppress interaction before the index is ready;
+            // re-enable it once Fuse is wired up.
             let options = {
                 distance: 100,
                 threshold: 0.4,
@@ -188,6 +191,7 @@ function loadSearchIndex() {
                 }
             }
             fuse = new Fuse(data, options);
+            sInput.disabled = false;
         })
         .catch(function (err) {
             console.error('Failed to load search index:', err);
