@@ -9,6 +9,8 @@ tags:
   - 博客
 categories:
   - 随笔
+series:
+  - 博客搭建
 ShowToc: true
 TocOpen: false
 ---
