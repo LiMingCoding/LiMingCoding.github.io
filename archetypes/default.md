@@ -6,7 +6,8 @@ draft: true
 # description: "" # SEO 摘要，会出现在 RSS 和 meta description
 # tags: []        # 标签，例如: [Python, 异步]
 # categories: []  # 分类，例如: [编程笔记]
-# ShowToc: true   # 是否显示右侧目录
+ShowToc: true      # 是否显示右侧目录（默认开启；如不需要可注释掉）
+TocOpen: false     # 目录默认折叠；改成 true 让目录默认展开
 # cover:
 #   image: ""     # 头图相对路径，例如: /img/post-foo.png
 #   alt: ""
