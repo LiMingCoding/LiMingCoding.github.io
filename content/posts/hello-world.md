@@ -1,9 +1,9 @@
 ---
-title: "你好，这是黎明编程笔记的第一篇文章"
+title: "你好，这是LiMing编程笔记的第一篇文章"
 date: 2026-08-30T10:00:00+08:00
 draft: false
 slug: hello-world
-description: "黎明编程笔记开张，聊聊写博客的初衷、计划与内容方向。"
+description: "LiMing编程笔记开张，聊聊写博客的初衷、计划与内容方向。"
 tags:
   - 随笔
   - 博客
