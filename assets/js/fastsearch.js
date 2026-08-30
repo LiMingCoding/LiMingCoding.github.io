@@ -150,49 +150,54 @@ function makeTitleHtml(title, query) {
     return parts.join('');
 }
 
-window.onload = function () {
-    let xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-                let data = JSON.parse(xhr.responseText);
-                if (data) {
-                    let options = {
-                        distance: 100,
-                        threshold: 0.4,
-                        ignoreLocation: true,
-                        includeMatches: true,
-                        keys: [
-                            'title',
-                            'permalink',
-                            'summary',
-                            'content'
-                        ]
-                    };
-                    if (params.fuseOpts) {
-                        options = {
-                            isCaseSensitive: params.fuseOpts.iscasesensitive ?? false,
-                            includeScore: params.fuseOpts.includescore ?? false,
-                            includeMatches: params.fuseOpts.includematches ?? true,
-                            minMatchCharLength: params.fuseOpts.minmatchcharlength ?? 1,
-                            shouldSort: params.fuseOpts.shouldsort ?? true,
-                            findAllMatches: params.fuseOpts.findallmatches ?? false,
-                            keys: params.fuseOpts.keys ?? ['title', 'permalink', 'summary', 'content'],
-                            location: params.fuseOpts.location ?? 0,
-                            threshold: params.fuseOpts.threshold ?? 0.4,
-                            distance: params.fuseOpts.distance ?? 100,
-                            ignoreLocation: params.fuseOpts.ignorelocation ?? true
-                        }
-                    }
-                    fuse = new Fuse(data, options);
-                }
-            } else {
-                console.log(xhr.responseText);
+function loadSearchIndex() {
+    return fetch('../index.json')
+        .then(function (response) {
+            if (!response.ok) {
+                throw new Error('Search index returned HTTP ' + response.status);
             }
-        }
-    };
-    xhr.open('GET', "../index.json");
-    xhr.send();
+            return response.json();
+        })
+        .then(function (data) {
+            if (!data) return;
+            let options = {
+                distance: 100,
+                threshold: 0.4,
+                ignoreLocation: true,
+                includeMatches: true,
+                keys: [
+                    'title',
+                    'permalink',
+                    'summary',
+                    'content'
+                ]
+            };
+            if (params.fuseOpts) {
+                options = {
+                    isCaseSensitive: params.fuseOpts.iscasesensitive ?? false,
+                    includeScore: params.fuseOpts.includescore ?? false,
+                    includeMatches: params.fuseOpts.includematches ?? true,
+                    minMatchCharLength: params.fuseOpts.minmatchcharlength ?? 1,
+                    shouldSort: params.fuseOpts.shouldsort ?? true,
+                    findAllMatches: params.fuseOpts.findallmatches ?? false,
+                    keys: params.fuseOpts.keys ?? ['title', 'permalink', 'summary', 'content'],
+                    location: params.fuseOpts.location ?? 0,
+                    threshold: params.fuseOpts.threshold ?? 0.4,
+                    distance: params.fuseOpts.distance ?? 100,
+                    ignoreLocation: params.fuseOpts.ignorelocation ?? true
+                }
+            }
+            fuse = new Fuse(data, options);
+        })
+        .catch(function (err) {
+            console.error('Failed to load search index:', err);
+        });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadSearchIndex);
+} else {
+    loadSearchIndex();
 }
 
 function activeToggle(ae) {
