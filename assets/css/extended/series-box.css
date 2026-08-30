@@ -123,3 +123,63 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+.series-box-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px dashed var(--border);
+}
+
+.series-box-nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.7rem;
+    border-radius: var(--radius);
+    color: var(--primary);
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: background-color 0.12s, border-color 0.12s;
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.series-box-nav-link:hover {
+    background: var(--tertiary);
+    border-color: var(--border);
+}
+
+.series-box-nav-link--next {
+    justify-content: flex-end;
+    text-align: right;
+}
+
+.series-box-nav-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.series-box-nav-label {
+    color: var(--secondary);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.series-box-nav-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.series-box-nav-arrow {
+    color: var(--secondary);
+    font-size: 1rem;
+    line-height: 1;
+}

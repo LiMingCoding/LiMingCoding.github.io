@@ -12,9 +12,19 @@
     series: series }`), so /series/<name>/ listing pages come for free
     via PaperMod's taxonomy.html.
 
-    Inside the box we list every post in the series, sorted by date
-    (taxonomy's default ordering), and mark the current post with a
-    check so readers can see where they are in the sequence.
+    Inside the box we list every post in the series, sorted primarily
+    by `weight` (front matter, ascending) and then by `date` (ascending)
+    — so the default chronological order still works for posts without
+    a weight, and any post can opt into a fixed slot by setting
+    `weight: N`. Caveat: if *some* posts in a series have weight and
+    others don't, the unweighted ones all sit at weight=0 and will
+    appear first. To get a predictable order, set weight on every post
+    in the series.
+
+    We also render a "前一篇 / 下一篇" navigation row below the list
+    so readers can step through the series without bouncing back to
+    the landing page. On the first post we render only the next link;
+    on the last post only the previous link.
 */}}
 
 {{- $seriesTerms := .GetTerms "series" }}
@@ -22,8 +32,14 @@
 {{- range $seriesTerms }}
 {{- $seriesName := .LinkTitle }}
 {{- $seriesUrl := .RelPermalink }}
-{{- $seriesPages := .Pages.ByDate }}
+{{- $seriesPages := sort .Pages "Weight" "asc" }}
 {{- $total := len $seriesPages }}
+
+{{- /* Find the current post's index within the sorted list. */}}
+{{- $currentIdx := -1 }}
+{{- range $i, $p := $seriesPages }}
+    {{- if eq $p.RelPermalink $.RelPermalink }}{{ $currentIdx = $i }}{{ end }}
+{{- end }}
 
 {{- if eq $total 1 }}
 {{- /* Only one post in this series — link the name, no list. */}}
@@ -57,6 +73,32 @@
         </li>
         {{- end }}
     </ol>
+    {{- if and (ge $currentIdx 0) (gt $total 1) }}
+    {{- $prevIdx := sub $currentIdx 1 }}
+    {{- $nextIdx := add $currentIdx 1 }}
+    <nav class="series-box-nav" aria-label="系列内导航">
+        {{- if ge $prevIdx 0 }}
+        {{- $prev := index $seriesPages $prevIdx }}
+        <a class="series-box-nav-link series-box-nav-link--prev" href="{{ $prev.RelPermalink }}" rel="prev">
+            <span class="series-box-nav-arrow" aria-hidden="true">←</span>
+            <span class="series-box-nav-text">
+                <span class="series-box-nav-label">前一篇</span>
+                <span class="series-box-nav-title">{{ $prev.LinkTitle }}</span>
+            </span>
+        </a>
+        {{- end }}
+        {{- if lt $nextIdx $total }}
+        {{- $next := index $seriesPages $nextIdx }}
+        <a class="series-box-nav-link series-box-nav-link--next" href="{{ $next.RelPermalink }}" rel="next">
+            <span class="series-box-nav-text">
+                <span class="series-box-nav-label">下一篇</span>
+                <span class="series-box-nav-title">{{ $next.LinkTitle }}</span>
+            </span>
+            <span class="series-box-nav-arrow" aria-hidden="true">→</span>
+        </a>
+        {{- end }}
+    </nav>
+    {{- end }}
 </aside>
 {{- end }}
 
