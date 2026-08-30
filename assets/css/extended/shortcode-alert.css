@@ -1,0 +1,58 @@
+/* Alert/callout shortcode styles. 4 variants with consistent layout. */
+.alert {
+    --alert-border: var(--secondary);
+    --alert-bg: rgba(150, 150, 150, 0.08);
+    --alert-fg: var(--primary);
+    margin: 1.5rem 0;
+    padding: 0.75rem 1rem;
+    border-left: 4px solid var(--alert-border);
+    border-radius: var(--radius, 8px);
+    background: var(--alert-bg);
+    color: var(--alert-fg);
+}
+
+.alert-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.alert-icon {
+    font-size: 1.1em;
+}
+
+.alert-body > :first-child {
+    margin-top: 0;
+}
+
+.alert-body > :last-child {
+    margin-bottom: 0;
+}
+
+.alert-body p,
+.alert-body ul,
+.alert-body ol {
+    margin: 0.4rem 0;
+}
+
+.alert-info {
+    --alert-border: #3b82f6;
+    --alert-bg: rgba(59, 130, 246, 0.08);
+}
+
+.alert-warning {
+    --alert-border: #f59e0b;
+    --alert-bg: rgba(245, 158, 11, 0.08);
+}
+
+.alert-danger {
+    --alert-border: #ef4444;
+    --alert-bg: rgba(239, 68, 68, 0.08);
+}
+
+.alert-tip {
+    --alert-border: #10b981;
+    --alert-bg: rgba(16, 185, 129, 0.08);
+}

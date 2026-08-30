@@ -1,0 +1,33 @@
+{{- /*
+  Alert/callout block.
+  Usage (positional type, no title):
+    {{< alert info >}}
+    内容
+    {{< /alert >}}
+
+  Usage (named, required when passing title — Hugo forbids
+  mixing positional and named parameters in a single call):
+    {{< alert type="warning" title="注意" >}}
+    内容
+    {{< /alert >}}
+*/ -}}
+{{- $type := or (.Get "type") (.Get 0) "info" -}}
+{{- $validTypes := slice "info" "warning" "danger" "tip" -}}
+{{- if not (in $validTypes $type) -}}
+  {{- $type = "info" -}}
+{{- end -}}
+{{- $title := .Get "title" -}}
+{{- $icon := index (dict
+    "info"    "ℹ️"
+    "warning" "⚠️"
+    "danger"  "🚫"
+    "tip"     "💡") $type -}}
+<div class="alert alert-{{ $type }}">
+  <div class="alert-title">
+    <span class="alert-icon">{{ $icon }}</span>
+    {{- with $title }}<span class="alert-title-text">{{ . }}</span>{{ else }}<span class="alert-title-text">{{ $type | title }}</span>{{ end }}
+  </div>
+  <div class="alert-body">
+    {{- .Inner | safeHTML -}}
+  </div>
+</div>
