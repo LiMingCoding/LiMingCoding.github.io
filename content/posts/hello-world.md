@@ -11,9 +11,6 @@ categories:
   - 随笔
 ShowToc: true
 TocOpen: false
-cover:
-  image: ""   # 留空，用主题默认头图；如要自定义，放一张图到 /img/post-hello-world.png
-  alt: ""
 ---
 
 ## 为什么开这个博客
