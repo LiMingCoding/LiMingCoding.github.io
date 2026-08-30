@@ -1,0 +1,123 @@
+{{- /*
+    Override of PaperMod's _partials/index_profile.html.
+
+    Why: PaperMod's profile-mode home shows avatar + buttons and stops
+    there — no taxonomy entry points. We append a small "分类 / 标签"
+    chip cloud below the profile so visitors can browse content by topic
+    from the home page. /categories/ and /tags/ already render
+    correctly via PaperMod's taxonomy.html; we only link to them.
+
+    Layout gotcha: PaperMod's .main .profile is `display: flex;
+    align-items: center`, so anything appended inside the .profile div
+    becomes a flex sibling of .profile_inner and sits *beside* the
+    centered avatar/title — not below it. The taxonomy block is rendered
+    here as a sibling of .profile (outside the flex parent) so it sits
+    full-width underneath the profile, in normal block flow.
+
+    The .profile div itself is reproduced verbatim from PaperMod so
+    `git diff themes/PaperMod/layouts/_partials/index_profile.html`
+    stays focused on the additions.
+*/}}
+
+<div class="profile">
+    {{- with site.Params.profileMode }}
+    <div class="profile_inner">
+        {{- if .imageUrl -}}
+        {{- $img := "" }}
+        {{- if not (urls.Parse .imageUrl).IsAbs }}
+            {{- $img = resources.Get .imageUrl }}
+        {{- end }}
+        {{- if $img }}
+            {{- $processableFormats := (slice "jpg" "jpeg" "png" "tif" "bmp" "gif") -}}
+            {{- if hugo.IsExtended -}}
+                {{- $processableFormats = $processableFormats | append "webp" -}}
+            {{- end -}}
+            {{- $prod := (hugo.IsProduction | or (eq site.Params.env "production")) }}
+            {{- if and (in $processableFormats $img.MediaType.SubType) (eq $prod true)}}
+                {{- if (not (and (not .imageHeight) (not .imageWidth))) }}
+                    {{- $img = $img.Resize (printf "%dx%d" .imageWidth .imageHeight) }}
+                {{- else if .imageHeight }}
+                    {{- $img = $img.Resize (printf "x%d" .imageHeight) }}
+                {{ else if .imageWidth }}
+                    {{- $img = $img.Resize "%dx" .imageWidth }}
+                {{ else }}
+                    {{- $img = $img.Resize "150x150" }}
+                {{- end }}
+            {{- end }}
+            <img draggable="false" src="{{ $img.Permalink }}" alt="{{ .imageTitle | default "profile image" }}" title="{{ .imageTitle }}"
+                height="{{ .imageHeight | default 150 }}" width="{{ .imageWidth | default 150 }}" />
+        {{- else }}
+        <img draggable="false" src="{{ .imageUrl | absURL }}" alt="{{ .imageTitle | default "profile image" }}" title="{{ .imageTitle }}"
+            height="{{ .imageHeight | default 150 }}" width="{{ .imageWidth | default 150 }}" />
+        {{- end }}
+        {{- end }}
+        <h1>{{ .title | default site.Title | markdownify }}</h1>
+        <span>{{ .subtitle | markdownify }}</span>
+        {{- partial "social_icons.html" -}}
+
+        {{- with .buttons }}
+        <div class="buttons">
+            {{- range . }}
+            <a class="button" href="{{ trim .url " " }}" rel="noopener" title="{{ .name }}">
+                <span class="button-inner">
+                    {{ .name }}
+                    {{- if (findRE "://" .url) }}&nbsp;
+                    <svg fill="none" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" height="14" width="14">
+                        <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path>
+                        <path d="M15 3h6v6"></path>
+                        <path d="M10 14L21 3"></path>
+                    </svg>
+                    {{- end }}
+                </span>
+            </a>
+            {{- end }}
+        </div>
+        {{- end }}
+    </div>
+    {{- end}}
+</div>
+
+{{/* BEGIN home taxonomy cloud — additions over upstream.
+     Rendered as a sibling of .profile so PaperMod's flex layout on
+     .main .profile does not put us beside the avatar. */}}
+{{- $catTerms := site.Taxonomies.categories -}}
+{{- $tagTerms := site.Taxonomies.tags -}}
+{{- if or $catTerms $tagTerms }}
+<div class="home-taxonomies">
+    {{- if $catTerms }}
+    <section class="home-taxonomies-section">
+        <h3 class="home-taxonomies-title">📂 分类</h3>
+        <ul class="home-taxonomies-list">
+            {{- range $name, $term := $catTerms }}
+            {{- $display := $term.Page.LinkTitle | default $name }}
+            <li>
+                <a class="home-taxonomy-chip" href="{{ $term.Page.RelPermalink }}" aria-label="分类 {{ $display }}，共 {{ $term.Count }} 篇">
+                    <span class="home-taxonomy-name">{{ $display }}</span>
+                    <span class="home-taxonomy-count">{{ $term.Count }}</span>
+                </a>
+            </li>
+            {{- end }}
+        </ul>
+    </section>
+    {{- end }}
+
+    {{- if $tagTerms }}
+    <section class="home-taxonomies-section">
+        <h3 class="home-taxonomies-title">🏷️ 标签</h3>
+        <ul class="home-taxonomies-list">
+            {{- range $name, $term := $tagTerms }}
+            {{- $display := $term.Page.LinkTitle | default $name }}
+            <li>
+                <a class="home-taxonomy-chip" href="{{ $term.Page.RelPermalink }}" aria-label="标签 {{ $display }}，共 {{ $term.Count }} 篇">
+                    <span class="home-taxonomy-name">{{ $display }}</span>
+                    <span class="home-taxonomy-count">{{ $term.Count }}</span>
+                </a>
+            </li>
+            {{- end }}
+        </ul>
+    </section>
+    {{- end }}
+</div>
+{{- end }}
+{{/* END home taxonomy cloud */}}

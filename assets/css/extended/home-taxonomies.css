@@ -1,0 +1,88 @@
+/* Home taxonomy cloud: chip-style entry points under the profile block.
+   Visual language mirrors PaperMod's existing .terms-tags on
+   /categories/ and /tags/ pages so the home looks consistent with
+   those archives.
+
+   PaperMod sets `.main .profile { min-height: calc(100vh - header -
+   footer - gap*2) }` to give the profile a hero feel. With our taxonomy
+   block rendered as a sibling of .profile (see layouts/_partials/
+   index_profile.html), that min-height pushes the chips below the
+   fold on most screens. Override it here so the cloud is reachable
+   without scrolling. */
+
+.main .profile {
+    min-height: auto;
+    padding: 1.5rem 0 1rem;
+}
+
+.home-taxonomies {
+    max-width: 480px;
+    margin: 1.75rem auto 0;
+    padding-top: 1.5rem;
+    border-top: 1px dashed var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.home-taxonomies-section {
+    text-align: left;
+}
+
+.home-taxonomies-title {
+    margin: 0 0 0.6rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--secondary);
+    letter-spacing: 0.05em;
+}
+
+.home-taxonomies-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.home-taxonomy-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.7rem;
+    background: var(--code-bg);
+    color: var(--primary);
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    text-decoration: none;
+    font-size: 0.85rem;
+    line-height: 1.2;
+    transition: background-color 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.home-taxonomy-chip:hover {
+    background: var(--tertiary);
+    border-color: var(--secondary);
+    transform: translateY(-1px);
+}
+
+.home-taxonomy-name {
+    /* keeps CJK and ASCII on the same baseline */
+    white-space: nowrap;
+}
+
+.home-taxonomy-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.4em;
+    height: 1.4em;
+    padding: 0 0.35em;
+    background: var(--secondary);
+    color: var(--theme);
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1;
+}
