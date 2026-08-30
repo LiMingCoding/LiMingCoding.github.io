@@ -90,6 +90,10 @@ menu:
       name: 关于
       url: /about/
       weight: 7
+    - identifier: rss
+      name: RSS
+      url: /index.xml
+      weight: 9
 
 # ---------- Markdown ----------
 markup:
