@@ -122,10 +122,6 @@ menu:
       name: 归档
       url: /archives/
       weight: 3
-    - identifier: search
-      name: 搜索
-      url: /search/
-      weight: 5
     - identifier: about
       name: 关于
       url: /about/
