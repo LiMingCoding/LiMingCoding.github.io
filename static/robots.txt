@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://limingcoding.github.io/sitemap.xml
