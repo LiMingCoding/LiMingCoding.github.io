@@ -74,7 +74,7 @@ params:
   comments: true
   giscus:
     repo: "LiMingCoding/LiMingCoding.github.io"
-    repoId: "387329406"
+    repoId: "MDEwOlJlcG9zaXRvcnkzODczMjk0MDY="
     category: "general"
     categoryId: "DIC_kwDOFxYtfs4DEf3j"
     mapping: "pathname"
