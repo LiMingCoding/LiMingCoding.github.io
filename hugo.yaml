@@ -20,6 +20,9 @@ params:
     - LiMingCoding
     - Hugo
     - PaperMod
+  # 默认 OG / Twitter share image（per-page 的 images front matter 会覆盖）
+  images:
+    - /img/og-default.svg
 
   defaultTheme: auto
   ShowThemeToggleButton: true
