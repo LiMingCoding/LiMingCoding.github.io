@@ -1,10 +1,33 @@
 {{- /*
     Override of PaperMod's _partials/index_profile.html.
 
-    Kept only because the image-resize branch below differs slightly from
-    upstream. The home taxonomy chip cloud that used to live here now
-    lives on the archive page (see layouts/_partials/archive-taxonomies.html).
-*/}}
+    Home hero redesign ("home-hero", tech aesthetic):
+      1. Ambient fixed background: deep-space gradient + neon glow orbs +
+         perspective grid + slow scan sweep (all aria-hidden, pointer-events none).
+      2. Hero: avatar with rotating conic-gradient halo + breathing ring,
+         gradient title with per-character staggered fade-in-up entrance,
+         subtitle / socials / buttons fading in after (CSS `backwards` fill so
+         hover transforms keep working and no layout shift).
+      3. Featured: the 3 newest posts from params.mainSections as
+         glassmorphism cards under a "最新文章" header linking to /archives/.
+
+    Only rendered on the home page: PaperMod's list.html calls this partial
+    when profileMode.enabled and .IsHome.
+
+    The taxonomy chip cloud deliberately lives on the archive page
+    (layouts/_partials/archive-taxonomies.html) — do not re-add it here.
+*/ -}}
+
+{{- $mainSections := site.Params.mainSections | default (slice "post") -}}
+{{- $featured := (where site.RegularPages "Type" "in" $mainSections) | first 3 -}}
+
+<div class="hh-hero" aria-hidden="true">
+    <span class="hh-orb hh-orb-a"></span>
+    <span class="hh-orb hh-orb-b"></span>
+    <span class="hh-orb hh-orb-c"></span>
+    <span class="hh-grid"></span>
+    <span class="hh-scan"></span>
+</div>
 
 <div class="profile">
     {{- with site.Params.profileMode }}
@@ -14,41 +37,50 @@
         {{- if not (urls.Parse .imageUrl).IsAbs }}
             {{- $img = resources.Get .imageUrl }}
         {{- end }}
-        {{- if $img }}
-            {{- $processableFormats := (slice "jpg" "jpeg" "png" "tif" "bmp" "gif") -}}
-            {{- if hugo.IsExtended -}}
-                {{- $processableFormats = $processableFormats | append "webp" -}}
-            {{- end -}}
-            {{- $prod := (hugo.IsProduction | or (eq site.Params.env "production")) }}
-            {{- if and (in $processableFormats $img.MediaType.SubType) (eq $prod true)}}
-                {{- if (not (and (not .imageHeight) (not .imageWidth))) }}
-                    {{- $img = $img.Resize (printf "%dx%d" .imageWidth .imageHeight) }}
-                {{- else if .imageHeight }}
-                    {{- $img = $img.Resize (printf "x%d" .imageHeight) }}
-                {{ else if .imageWidth }}
-                    {{- $img = $img.Resize "%dx" .imageWidth }}
-                {{ else }}
-                    {{- $img = $img.Resize "150x150" }}
+        <span class="hh-avatar">
+            {{- if $img }}
+                {{- $processableFormats := (slice "jpg" "jpeg" "png" "tif" "bmp" "gif") -}}
+                {{- if hugo.IsExtended -}}
+                    {{- $processableFormats = $processableFormats | append "webp" -}}
+                {{- end -}}
+                {{- $prod := (hugo.IsProduction | or (eq site.Params.env "production")) }}
+                {{- if and (in $processableFormats $img.MediaType.SubType) (eq $prod true)}}
+                    {{- if (not (and (not .imageHeight) (not .imageWidth))) }}
+                        {{- $img = $img.Resize (printf "%dx%d" .imageWidth .imageHeight) }}
+                    {{- else if .imageHeight }}
+                        {{- $img = $img.Resize (printf "x%d" .imageHeight) }}
+                    {{ else if .imageWidth }}
+                        {{- $img = $img.Resize "%dx" .imageWidth }}
+                    {{ else }}
+                        {{- $img = $img.Resize "150x150" }}
+                    {{- end }}
                 {{- end }}
-            {{- end }}
             <img draggable="false" src="{{ $img.Permalink }}" alt="{{ .imageTitle | default "profile image" }}" title="{{ .imageTitle }}"
                 height="{{ .imageHeight | default 150 }}" width="{{ .imageWidth | default 150 }}" />
-        {{- else }}
-        <img draggable="false" src="{{ .imageUrl | absURL }}" alt="{{ .imageTitle | default "profile image" }}" title="{{ .imageTitle }}"
-            height="{{ .imageHeight | default 150 }}" width="{{ .imageWidth | default 150 }}" />
+            {{- else }}
+            <img draggable="false" src="{{ .imageUrl | absURL }}" alt="{{ .imageTitle | default "profile image" }}" title="{{ .imageTitle }}"
+                height="{{ .imageHeight | default 150 }}" width="{{ .imageWidth | default 150 }}" />
+            {{- end }}
+            <span class="hh-halo"></span>
+            <span class="hh-breathe"></span>
+        </span>
         {{- end }}
-        {{- end }}
-        <h1>{{ .title | default site.Title | markdownify }}</h1>
-        <span>{{ .subtitle | markdownify }}</span>
+        {{- $titleText := (.title | default site.Title) }}
+        <h1 class="hh-title" aria-label="{{ $titleText }}">
+            {{- range $i, $ch := (split $titleText "") }}
+            <span class="hh-char" style="--i:{{ add $i 1 }}">{{ $ch }}</span>
+            {{- end }}
+        </h1>
+        <span class="hh-subtitle">{{ .subtitle | markdownify }}</span>
         {{- partial "social_icons.html" -}}
 
         {{- with .buttons }}
         <div class="buttons">
-            {{- range . }}
-            <a class="button" href="{{ trim .url " " }}" rel="noopener" title="{{ .name }}">
+            {{- range $i, $btn := . }}
+            <a class="button" href="{{ trim $btn.url " " }}" rel="noopener" title="{{ $btn.name }}" style="--i:{{ add $i 14 }}">
                 <span class="button-inner">
-                    {{ .name }}
-                    {{- if (findRE "://" .url) }}&nbsp;
+                    {{ $btn.name }}
+                    {{- if (findRE "://" $btn.url) }}&nbsp;
                     <svg fill="none" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round"
                         stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" height="14" width="14">
                         <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path>
@@ -64,3 +96,36 @@
     </div>
     {{- end}}
 </div>
+
+{{- with $featured }}
+<section class="hh-featured" aria-labelledby="hh-featured-title">
+    <div class="hh-featured-head">
+        <h2 id="hh-featured-title"><span class="hh-h2-deco" aria-hidden="true"></span>最新文章</h2>
+        <a class="hh-all-link" href="/archives/">全部文章 <span class="hh-arrow">→</span></a>
+    </div>
+    <div class="hh-cards">
+        {{- range $i, $page := . }}
+        {{- $cat := "" }}
+        {{- with $page.Params.categories }}{{ $cat = index . 0 }}{{- else }}{{ with $page.Params.tags }}{{ $cat = index . 0 }}{{ end }}{{ end }}
+        {{- $sum := $page.Description | default ($page.Summary | plainify) }}
+        {{- $sum = $sum | plainify }}
+        {{- $sum = strings.Truncate 92 "…" $sum }}
+        <article class="hh-card-art">
+        <a class="hh-card" href="{{ $page.RelPermalink }}" style="--i:{{ add $i 17 }}">
+            <div class="hh-card-meta">
+                <time datetime="{{ $page.Date.Format "2006-01-02" }}">{{ $page.Date.Format "2006-01-02" }}</time>
+                {{- if $cat }}<span class="hh-chip">{{ $cat }}</span>{{ end }}
+            </div>
+            <h3 class="hh-card-title">{{ $page.Title }}</h3>
+            <p class="hh-card-summary">{{ $sum }}</p>
+            <span class="hh-card-foot">
+                <span class="hh-stat">{{ $page.ReadingTime }} 分钟</span>
+                <span class="hh-stat">{{ $page.WordCount }} 字</span>
+                <span class="hh-readmore">阅读 <span class="hh-arrow">→</span></span>
+            </span>
+        </a>
+        </article>
+        {{- end }}
+    </div>
+</section>
+{{- end }}
