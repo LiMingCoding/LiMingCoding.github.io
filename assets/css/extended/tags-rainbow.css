@@ -1,0 +1,132 @@
+/* Rainbow tag chips. Override PaperMod's muted --code-bg style with
+   vivid per-position colors so tag pages feel "五颜六色". */
+
+/* Color palettes — pick ones that look good in both light + dark mode.
+   Each nth-child slice picks a palette. */
+:root {
+    --tag-hue-0: #ef4444; /* red */
+    --tag-hue-1: #f59e0b; /* amber */
+    --tag-hue-2: #10b981; /* emerald */
+    --tag-hue-3: #06b6d4; /* cyan */
+    --tag-hue-4: #3b82f6; /* blue */
+    --tag-hue-5: #8b5cf6; /* violet */
+    --tag-hue-6: #ec4899; /* pink */
+    --tag-fg-on-color: #ffffff;
+    --tag-fg-dark: #1f2937;
+}
+
+/* --- /tags/ list page (PaperMod .terms-tags) --- */
+.terms-tags li a,
+.terms-tags li span {
+    display: inline-block;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    line-height: 1.2;
+    text-decoration: none;
+    color: var(--tag-fg-on-color);
+    transition: transform 0.15s, filter 0.2s, box-shadow 0.2s;
+    border: 1px solid transparent;
+}
+
+/* cycle 7 colors */
+.terms-tags li:nth-child(7n+1) a,
+.terms-tags li:nth-child(7n+1) span {
+    background: var(--tag-hue-0);
+}
+.terms-tags li:nth-child(7n+2) a,
+.terms-tags li:nth-child(7n+2) span {
+    background: var(--tag-hue-1);
+    color: var(--tag-fg-dark);
+}
+.terms-tags li:nth-child(7n+3) a,
+.terms-tags li:nth-child(7n+3) span {
+    background: var(--tag-hue-2);
+}
+.terms-tags li:nth-child(7n+4) a,
+.terms-tags li:nth-child(7n+4) span {
+    background: var(--tag-hue-3);
+    color: var(--tag-fg-dark);
+}
+.terms-tags li:nth-child(7n+5) a,
+.terms-tags li:nth-child(7n+5) span {
+    background: var(--tag-hue-4);
+}
+.terms-tags li:nth-child(7n+6) a,
+.terms-tags li:nth-child(7n+6) span {
+    background: var(--tag-hue-5);
+}
+.terms-tags li:nth-child(7n) a,
+.terms-tags li:nth-child(7n) span {
+    background: var(--tag-hue-6);
+}
+
+.terms-tags li a:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1) saturate(1.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* --- post-tags (single post footer) --- */
+.post-tags li a {
+    background: var(--code-bg) !important;
+    border: 1px solid var(--border);
+    color: var(--primary) !important;
+    padding: 0.25rem 0.6rem !important;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    transition: transform 0.15s, filter 0.2s, border-color 0.2s;
+}
+
+.post-tags li:nth-child(7n+1) a { background: var(--tag-hue-0) !important; color: var(--tag-fg-on-color) !important; border-color: var(--tag-hue-0); }
+.post-tags li:nth-child(7n+2) a { background: var(--tag-hue-1) !important; color: var(--tag-fg-dark) !important; border-color: var(--tag-hue-1); }
+.post-tags li:nth-child(7n+3) a { background: var(--tag-hue-2) !important; color: var(--tag-fg-on-color) !important; border-color: var(--tag-hue-2); }
+.post-tags li:nth-child(7n+4) a { background: var(--tag-hue-3) !important; color: var(--tag-fg-dark) !important; border-color: var(--tag-hue-3); }
+.post-tags li:nth-child(7n+5) a { background: var(--tag-hue-4) !important; color: var(--tag-fg-on-color) !important; border-color: var(--tag-hue-4); }
+.post-tags li:nth-child(7n+6) a { background: var(--tag-hue-5) !important; color: var(--tag-fg-on-color) !important; border-color: var(--tag-hue-5); }
+.post-tags li:nth-child(7n)   a { background: var(--tag-hue-6) !important; color: var(--tag-fg-on-color) !important; border-color: var(--tag-hue-6); }
+
+.post-tags li a:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1) saturate(1.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* --- home page taxonomy chips (our existing override) --- */
+/* NOTE: each chip is an <a.home-taxonomy-chip> wrapped in an <li> (see
+   layouts/_partials/index_profile.html), so nth-child must target the
+   <li> position — every <a> is :nth-child(1) of its own <li> otherwise. */
+.home-taxonomy-chip {
+    background: var(--code-bg);
+    color: var(--primary);
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    padding: 0.3rem 0.7rem;
+    transition: transform 0.15s, filter 0.2s, box-shadow 0.2s;
+}
+
+.home-taxonomies-list li:nth-child(7n+1) .home-taxonomy-chip { background: var(--tag-hue-0); color: var(--tag-fg-on-color); border-color: var(--tag-hue-0); }
+.home-taxonomies-list li:nth-child(7n+2) .home-taxonomy-chip { background: var(--tag-hue-1); color: var(--tag-fg-dark); border-color: var(--tag-hue-1); }
+.home-taxonomies-list li:nth-child(7n+3) .home-taxonomy-chip { background: var(--tag-hue-2); color: var(--tag-fg-on-color); border-color: var(--tag-hue-2); }
+.home-taxonomies-list li:nth-child(7n+4) .home-taxonomy-chip { background: var(--tag-hue-3); color: var(--tag-fg-dark); border-color: var(--tag-hue-3); }
+.home-taxonomies-list li:nth-child(7n+5) .home-taxonomy-chip { background: var(--tag-hue-4); color: var(--tag-fg-on-color); border-color: var(--tag-hue-4); }
+.home-taxonomies-list li:nth-child(7n+6) .home-taxonomy-chip { background: var(--tag-hue-5); color: var(--tag-fg-on-color); border-color: var(--tag-hue-5); }
+.home-taxonomies-list li:nth-child(7n)   .home-taxonomy-chip { background: var(--tag-hue-6); color: var(--tag-fg-on-color); border-color: var(--tag-hue-6); }
+
+.home-taxonomy-chip:hover {
+    /* override existing hover since we now have colored bg */
+    transform: translateY(-2px);
+    filter: brightness(1.1) saturate(1.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.home-taxonomy-count {
+    /* keep count chip readable on colored backgrounds */
+    background: rgba(255, 255, 255, 0.25) !important;
+    color: #ffffff !important;
+}
+.home-taxonomies-list li:nth-child(7n+2) .home-taxonomy-count,
+.home-taxonomies-list li:nth-child(7n+4) .home-taxonomy-count {
+    background: rgba(0, 0, 0, 0.15) !important;
+    color: var(--tag-fg-dark) !important;
+}
