@@ -1,0 +1,42 @@
+{{- /*
+  Video embed shortcode. Supports YouTube, Bilibili, and self-hosted.
+  Usage:
+    {{< video youtube="dQw4w9WgXcQ" >}}
+    {{< video bilibili="BV1xx411c7mD" p="2" >}}
+    {{< video src="/videos/local.mp4" >}}
+*/ -}}
+{{- $youtube := .Get "youtube" -}}
+{{- $bilibili := .Get "bilibili" -}}
+{{- $src := .Get "src" -}}
+{{- $p := .Get "p" | default "1" -}}
+{{- $type := .Get "type" | default "video/mp4" -}}
+{{- $title := .Get "title" | default "Embedded video" -}}
+
+<div class="video-embed">
+  {{- if $youtube }}
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/{{ $youtube }}"
+    title="{{ $title }}"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+    loading="lazy"
+    referrerpolicy="strict-origin-when-cross-origin">
+  </iframe>
+  {{- else if $bilibili }}
+  <iframe
+    src="//player.bilibili.com/player.html?bvid={{ $bilibili }}&p={{ $p }}&autoplay=0"
+    title="{{ $title }}"
+    frameborder="no"
+    allowfullscreen
+    loading="lazy">
+  </iframe>
+  {{- else if $src }}
+  <video controls preload="metadata" playsinline>
+    <source src="{{ $src }}" type="{{ $type }}">
+    您的浏览器不支持 video 标签。
+  </video>
+  {{- else }}
+  <p style="color: var(--secondary);">video shortcode: missing required parameter (youtube / bilibili / src)</p>
+  {{- end }}
+</div>
