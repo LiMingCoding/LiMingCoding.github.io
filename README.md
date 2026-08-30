@@ -13,7 +13,7 @@
 | Hugo | extended `0.165.0` |
 | 主题 | PaperMod（git submodule 引入） |
 | 部署 | GitHub Actions → GitHub Pages |
-| 搜索 | Fuse.js + 自定义摘要片段 |
+| 搜索 | Pagefind（构建后自动索引；CJK 分词 + 小节锚点直达） |
 
 ## 本地预览
 
@@ -77,8 +77,7 @@ hugo new posts/my-new-post.md
 | `content/posts/*.md` | 博客文章 |
 | `content/about.md` | 关于页 |
 | `content/archives.md` | 归档页 |
-| `content/search.md` | 站内搜索页 |
-| `assets/js/fastsearch.js` | 搜索脚本（Fuse.js + 摘要片段） |
+| `content/search.md` | 旧站内搜索页（现为跳转占位，导入 /archives/） |
 | `assets/css/extended/` | 自定义扩展样式 |
 | `static/img/` | 静态图片（头像、头图等） |
 | `themes/PaperMod/` | 主题（submodule，主题升级时拉取） |

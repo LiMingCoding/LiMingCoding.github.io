@@ -24,7 +24,7 @@
     --pf-skeleton: var(--code-bg);
     --pf-outline-focus: var(--secondary);
     --pf-shadow-sm: none;
-    --pf-shadow-md: var(--shadow-code);
+    --pf-shadow-md: 0 4px 12px rgba(0, 0, 0, .1);
     --pf-font: inherit;
 
     --pf-input-height: 40px;
@@ -42,12 +42,14 @@
 /* ---- Token bridge: dark (explicit) ---- */
 html[data-theme="dark"] #pagefind-search {
     --pf-background: var(--theme);
+    --pf-shadow-md: 0 4px 12px rgba(0, 0, 0, .4);
 }
 
 /* ---- Token bridge: dark (auto + system pref) ---- */
 @media (prefers-color-scheme: dark) {
     html[data-theme="auto"] #pagefind-search {
         --pf-background: var(--theme);
+        --pf-shadow-md: 0 4px 12px rgba(0, 0, 0, .4);
     }
 }
 
