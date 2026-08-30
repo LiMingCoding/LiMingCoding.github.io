@@ -1,0 +1,19 @@
+{{- define "main" }}
+<header class="page-header">
+  <h1>{{ .Title }}</h1>
+  <div class="post-description">
+    站内搜索已并入「归档」页顶部。正在为你跳转……
+    <noscript>
+      若未自动跳转，请手动前往：<a href="{{ "archives/" | relURL }}">归档页</a>，在页面顶部的搜索框中查询。
+    </noscript>
+  </div>
+</header>
+<script>
+  (function () {
+    var base = {{ "archives/" | relURL }};
+    var params = new URLSearchParams(window.location.search);
+    var target = base + (params.toString() ? "?" + params.toString() : "");
+    window.location.replace(target);
+  })();
+</script>
+{{- end }}

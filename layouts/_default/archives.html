@@ -21,13 +21,17 @@
   {{- end }}
 </header>
 
+{{- /* 分类导航 chip 云置于页面顶部：作为搜索中心的浏览入口，
+     搜索结果展开时也保持可见（archive-search.js 不会切换它）。 */ -}}
+{{- partial "archive-taxonomies.html" . }}
+
 {{- /* Tier 1: stats summary bar */ -}}
 {{- partial "archive-stats.html" . }}
 
 {{- /* Tier 2: filter pills + view toggle */ -}}
 {{- partial "archive-filter.html" . }}
 
-{{- /* Tier 3: search box + sort + histogram (UI only; JS at end) */ -}}
+{{- /* Tier 3: Pagefind 搜索框 + 排序 + 随机（UI 在此，JS 见文末） */ -}}
 {{- partial "archive-search.html" . }}
 
 {{- $pages := where site.RegularPages "Type" "in" site.Params.mainSections }}
@@ -117,11 +121,7 @@
 {{- /* Tier 3: histogram is rendered by JS into #archive-histogram */ -}}
 <section id="archive-histogram" class="archive-histogram" aria-label="Post counts per month"></section>
 
-{{- /* Browse-by-topic chip cloud (categories / tags / series), kept at the
-    bottom so the interactive entry list stays the star of the page. */ -}}
-{{- partial "archive-taxonomies.html" . }}
-
-{{- /* Tier 3: client-side search + sort + histogram logic */ -}}
+{{- /* Tier 3: 排序 / 分页 / 随机 / Pagefind 搜索联动逻辑 */ -}}
 <script src="/js/archive-search.js" defer></script>
 
 {{- end }}{{/* end main */}}

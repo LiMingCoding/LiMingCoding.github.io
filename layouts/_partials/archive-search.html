@@ -1,16 +1,33 @@
 {{- /*
-    Tier 3 — search box UI + sort dropdown.
-    The histogram is rendered by JS into #archive-histogram.
-    The "no results" placeholder is shown/hidden by JS based on search.
+    Tier 3 — search + sort controls.
+
+    搜索由 Pagefind 组件 UI（内联组合）驱动，不再使用 PaperMod 的 Fuse 方案。
+    核心元素：
+      <pagefind-config>  设置 placeholder / debounce 等默认值
+      <pagefind-input>   搜索输入框（Light DOM，可自定义样式）
+      <pagefind-summary> 结果条数提示
+      <pagefind-results> 结果列表（含子结果锚点）
+    它们通过共享 instance="blog" 通信；bundlePath 由脚本自动探测为 /pagefind/。
+
+    排序 / 随机按钮仍由 archive-search.js 控制静态列表，与 Pagefind 互不干扰。
+    当存在查询词时，archive-search.js 会隐藏下方静态归档列表，仅显示搜索结果；
+    清空后恢复（同时保持顶部分类 chips 始终可见）。
 */}}
 
 <div class="archive-controls">
-  <input type="search"
-         id="archive-search-input"
-         class="archive-search-input"
-         placeholder="🔍 搜索标题或摘要..."
-         aria-label="搜索归档文章">
+  <pagefind-config
+    instance="blog"
+    placeholder="🔍 搜索全站文章（标题 / 正文 / 中文支持）"
+    debounce="250"></pagefind-config>
 
+  <div class="pagefind-search" id="pagefind-search">
+    <pagefind-input instance="blog"></pagefind-input>
+    <pagefind-summary instance="blog" default-message="输入关键词即时搜索，或按下方分类浏览。"></pagefind-summary>
+    <pagefind-results instance="blog" show-images="false" max-sub-results="3"></pagefind-results>
+  </div>
+</div>
+
+<div class="archive-controls archive-controls--tools">
   <select id="archive-sort-select" class="archive-sort-select" aria-label="排序方式">
     <option value="date-desc">最新优先</option>
     <option value="date-asc">最早优先</option>
@@ -29,7 +46,4 @@
   </button>
 </div>
 
-<div id="archive-no-results" class="archive-no-results" hidden>
-  没找到匹配的文章。换个关键词试试？
-</div>
 <nav id="archive-paginator" class="archive-paginator" aria-label="分页"></nav>

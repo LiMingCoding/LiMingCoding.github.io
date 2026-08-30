@@ -1,15 +1,17 @@
-/* Archive taxonomy cloud: chip-style browse-by-topic entry points at the
-   bottom of the archive page. Visual language mirrors PaperMod's existing
-   .terms-tags on /categories/ and /tags/ pages so the archive stays
-   consistent with those pages.
+/* Archive taxonomy cloud: chip-style browse-by-topic entry points at the TOP
+   of the archive page (the archive doubles as the search center). Visual
+   language mirrors PaperMod's existing .terms-tags on /categories/ and /tags/
+   pages so the archive stays consistent with those pages.
 
    The three sections (分类 / 标签 / 系列) flow in a wrapping horizontal
    row suited to the archive's full content width. */
 
 .archive-taxonomies {
-    margin: 2.5rem auto 0;
-    padding-top: 1.75rem;
-    border-top: 1px dashed var(--border);
+    margin: 0.5rem auto 1.75rem;
+    padding: 0;
+    border-top: none;
+    border-bottom: 1px dashed var(--border);
+    padding-bottom: 1.5rem;
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
@@ -82,8 +84,8 @@
 @media screen and (max-width: 768px) {
     .archive-taxonomies {
         flex-direction: column;
-        padding: 1.25rem 1rem 0;
-        margin-top: 1.25rem;
+        padding: 0 1rem 1.25rem;
+        margin: 0.5rem auto 1.25rem;
         gap: 1rem;
     }
     .archive-taxonomy-chip {

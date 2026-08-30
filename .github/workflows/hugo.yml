@@ -32,8 +32,16 @@ jobs:
           hugo-version: "0.165.0"
           extended: true
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
       - name: Build
         run: hugo --minify
+
+      - name: Build Pagefind index
+        run: npx --yes pagefind@1.5.2 --site public
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1

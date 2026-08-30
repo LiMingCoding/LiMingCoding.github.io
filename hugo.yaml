@@ -152,16 +152,8 @@ outputFormats:
     mediatype: application/rss+xml
     baseName: index
 
-outputs:
-  home:
-    - HTML
-    - RSS
-    - JSON # PaperMod 站内搜索的索引（/index.json）
-  section:
-    - HTML
-    - RSS
-    - JSON
-
+# 站内搜索改由 Pagefind 生成索引（构建后运行 pagefind --site public），
+# 因此这里不再输出 Fuse 用的 /index.json。
 pagination:
   pagerSize: 10
 

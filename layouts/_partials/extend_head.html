@@ -1,3 +1,10 @@
+{{- /* Pagefind 组件 UI：仅在归档页（站内搜索中心）加载其 CSS + JS。
+     脚本用 defer 解析期即注册 window.PagefindComponents 并自动 define
+     <pagefind-*> 自定义元素；CSS 里的 --pf-* token 由 extended/pagefind.css 覆盖。 */}}
+{{- if eq .Layout "archives" -}}
+<link rel="stylesheet" href="/pagefind/pagefind-component-ui.css">
+<script src="/pagefind/pagefind-component-ui.js" defer></script>
+{{- end -}}
 {{- if and .IsPage (eq .Kind "page") (not (eq .Layout "archives")) -}}
 {{- $mathEnabled := or (.Params.math) (.Site.Params.math) -}}
 {{- if $mathEnabled -}}

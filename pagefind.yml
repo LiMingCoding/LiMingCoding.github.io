@@ -1,0 +1,8 @@
+# Pagefind indexing config — auto-detected by the pagefind CLI (local + CI).
+# `glob` is relative to the --site directory (public/). Without it, Pagefind
+# indexes every generated HTML page, so Hugo's taxonomy term pages
+# (/tags/, /categories/, /series/) and list/pagination pages surface above the
+# actual articles for a common query like "博客". Matching only
+# posts/*/index.html indexes the individual article pages (not the /posts/
+# list page nor posts/page/N/ pagination), so archive search returns articles.
+glob: "posts/*/index.html"

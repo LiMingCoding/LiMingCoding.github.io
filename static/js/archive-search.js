@@ -1,43 +1,22 @@
-// Archive page — Tier 3: client-side search, sort, and monthly histogram.
-// Vanilla JS, no dependencies. Reads data-* attributes set by the Hugo
-// archive template (data-title, data-excerpt, data-date, data-reading-time,
-// data-category on each .archive-entry).
+// Archive page — Tier 3: sort, monthly histogram, random pick, client-side
+// pagination, plus the Pagefind inline-search glue.
+//
+// Vanilla JS, no build step. The static list (.archive-entry cards) supports
+// category filtering / sorting / pagination; full-text search is delegated to
+// the Pagefind component UI (see layouts/_partials/archive-search.html).
+//
+// data-* attributes read by this file are set by the Hugo archive template
+// (data-title, data-date, data-reading-time, data-category on each entry).
 
 (function () {
   'use strict';
 
   const root = document.querySelector('.archive-list');
-  if (!root) return;  // not on archive page
+  // The archive page is also the search center; if there is no .archive-list
+  // we are not on the archive page and can bail early.
+  if (!root) return;
 
   const entries = Array.from(root.querySelectorAll('.archive-entry'));
-  if (entries.length === 0) return;
-
-  // Cache original DOM order so we can revert sort if needed
-  const originalOrder = entries.slice();
-
-  // ---------- SEARCH ----------
-  const searchInput = document.getElementById('archive-search-input');
-  const noResults = document.getElementById('archive-no-results');
-
-  function applySearch(query) {
-    const q = query.trim().toLowerCase();
-    entries.forEach((el) => {
-      if (!q) {
-        el.dataset.searchHidden = '';
-        return;
-      }
-      const title = (el.dataset.title || '').toLowerCase();
-      const excerpt = (el.dataset.excerpt || '').toLowerCase();
-      const cat = (el.dataset.category || '').toLowerCase();
-      const match = title.includes(q) || excerpt.includes(q) || cat.includes(q);
-      el.dataset.searchHidden = match ? '' : '1';
-    });
-    applyCategoryFilter();
-  }
-
-  if (searchInput) {
-    searchInput.addEventListener('input', (e) => applySearch(e.target.value));
-  }
 
   // ---------- CATEGORY FILTER ----------
   // Active category is stored on the button via .archive-pill--active.
@@ -47,19 +26,17 @@
 
   function applyCategoryFilter() {
     entries.forEach((el) => {
-      // Preserve search-hidden state; just add category mismatch on top.
-      const searchHidden = el.dataset.searchHidden === '1';
       const cat = el.dataset.category || '';
       const catMatch = !activeCategory || cat === activeCategory;
-      el.dataset.hidden = (!catMatch || searchHidden) ? '1' : '';
+      el.dataset.hidden = catMatch ? '' : '1';
     });
     hideEmptyMonths();
+    applyPage(1);  // reset to first page of the filtered set
   }
 
   const catPills = document.querySelectorAll('.archive-pill--cat');
   catPills.forEach((p) => {
     p.addEventListener('click', () => {
-      // Toggle active state on pills
       catPills.forEach((q) => {
         q.classList.remove('archive-pill--active');
         q.setAttribute('aria-pressed', 'false');
@@ -68,12 +45,14 @@
       p.setAttribute('aria-pressed', 'true');
 
       activeCategory = p.dataset.cat || '';
-      applyCategoryFilter();
+      applyCategoryFilter();   // re-filters + resets to page 1
+      writeHashPage(1);        // reflect in URL only on explicit user action
     });
   });
 
   // ---------- SORT ----------
   const sortSelect = document.getElementById('archive-sort-select');
+  const originalOrder = entries.slice();  // cache DOM order to re-sort from
 
   function sortEntries(mode) {
     const sorted = originalOrder.slice();
@@ -99,13 +78,15 @@
       }
     });
 
-    // Re-insert in new order. We move each .archive-entry to the end of
-    // its current parent (.archive-posts), so the order within each month
-    // changes but the year/month grouping is preserved.
+    // Re-insert in new order. We move each .archive-entry to the end of its
+    // current parent (.archive-posts), so order within each month changes but
+    // the year/month grouping is preserved.
     sorted.forEach((el) => {
       const parent = el.parentElement;
       if (parent) parent.appendChild(el);
     });
+
+    applyPage(currentPage);  // re-paginate after reordering
   }
 
   if (sortSelect) {
@@ -114,16 +95,12 @@
 
   // ---------- HIDE EMPTY MONTH/YEAR GROUPS ----------
   function hideEmptyMonths() {
-    // Hide months where all entries are hidden
     document.querySelectorAll('.archive-month').forEach((m) => {
-      const entriesInMonth = m.querySelectorAll('.archive-entry');
-      const anyVisible = Array.from(entriesInMonth).some((e) => !e.dataset.hidden);
+      const anyVisible = Array.from(m.querySelectorAll('.archive-entry')).some((e) => !e.dataset.hidden);
       m.style.display = anyVisible ? '' : 'none';
     });
-    // Hide years where all months are hidden
     document.querySelectorAll('.archive-year').forEach((y) => {
-      const monthsInYear = y.querySelectorAll('.archive-month');
-      const anyVisible = Array.from(monthsInYear).some((m) => m.style.display !== 'none');
+      const anyVisible = Array.from(y.querySelectorAll('.archive-month')).some((m) => m.style.display !== 'none');
       y.style.display = anyVisible ? '' : 'none';
     });
   }
@@ -133,7 +110,6 @@
     const container = document.getElementById('archive-histogram');
     if (!container) return;
 
-    // Group visible entries by year-month
     const buckets = new Map();
     entries.forEach((el) => {
       const d = el.dataset.date;
@@ -145,7 +121,6 @@
 
     if (buckets.size === 0) return;
 
-    // Sort by key (chronological)
     const sorted = Array.from(buckets.entries()).sort((a, b) => a[0].localeCompare(b[0]));
     const maxCount = Math.max(...sorted.map(([, c]) => c));
 
@@ -186,7 +161,6 @@
   // ---------- RANDOM PICK ----------
   // Weighted toward older posts so the button truly helps you "discover"
   // something you wrote long ago and forgot about. Weight = (now - date).
-  // If you only have a few posts (<=3) just pick uniformly to avoid surprises.
   const randomBtn = document.getElementById('archive-random-btn');
 
   function pickRandom() {
@@ -200,8 +174,7 @@
     } else {
       const weights = candidates.map((el) => {
         const t = new Date(el.dataset.date || 0).getTime();
-        // Older => larger weight; clamp to >=1 day so same-day posts still have mass
-        return Math.max(now - t, 24 * 3600 * 1000);
+        return Math.max(now - t, 24 * 3600 * 1000);  // clamp to >= 1 day
       });
       const total = weights.reduce((a, b) => a + b, 0);
       let r = Math.random() * total;
@@ -214,7 +187,6 @@
 
     const link = pick.querySelector('.archive-entry-link');
     if (link && link.href) {
-      // Tiny visual feedback: brief pulse on the picked card before navigating
       pick.classList.add('archive-entry--picked');
       window.setTimeout(() => { window.location.href = link.href; }, 180);
     }
@@ -224,9 +196,8 @@
     randomBtn.addEventListener('click', pickRandom);
   }
 
-
   // ---------- PAGINATOR ----------
-  // Client-side pagination: respect search/sort visibility, sync URL hash.
+  // Client-side pagination over the (category-filtered) static list.
   const PAGE_SIZE = 10;
   const paginatorEl = document.getElementById('archive-paginator');
   let currentPage = 1;
@@ -244,7 +215,6 @@
   function writeHashPage(n) {
     const target = '#page=' + n;
     if (window.location.hash !== target) {
-      // replaceState avoids spamming browser history
       try { history.replaceState(null, '', window.location.pathname + window.location.search + target); }
       catch (_) { window.location.hash = target; }
     }
@@ -255,23 +225,14 @@
     const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
     currentPage = Math.min(Math.max(1, page), totalPages);
 
-    // Show only entries within the current page slice
     const visible = visibleEntries();
     const slice = visible.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
     const sliceSet = new Set(slice);
     entries.forEach((el) => {
-      // Within current page slice AND not already hidden by search/filter => display
-      if (sliceSet.has(el)) {
-        el.style.display = '';
-      } else if (el.dataset.hidden) {
-        el.style.display = 'none';
-      } else {
-        // Outside page slice but still matches current filter => hide by page
-        el.style.display = 'none';
-      }
+      el.style.display = sliceSet.has(el) ? '' : 'none';
     });
 
-    // Year/month grouping: hide headers whose entries are all hidden (page OR search)
+    // Year/month grouping: hide headers whose entries are all off-page/hidden.
     document.querySelectorAll('.archive-month').forEach((m) => {
       const any = Array.from(m.querySelectorAll('.archive-entry')).some((e) => e.style.display !== 'none');
       m.style.display = any ? '' : 'none';
@@ -281,7 +242,6 @@
       y.style.display = any ? '' : 'none';
     });
 
-    // Render the paginator control bar
     if (paginatorEl) {
       paginatorEl.innerHTML = '';
       if (totalPages <= 1) return;  // single page: no controls
@@ -303,7 +263,6 @@
 
       paginatorEl.appendChild(mkBtn('« 上一页', currentPage - 1, { disabled: currentPage === 1 }));
 
-      // Compact page-number list: show first, last, current ±1
       const numbers = new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
       [...numbers].filter((n) => n >= 1 && n <= totalPages).sort((a, b) => a - b).reduce((prev, n) => {
         if (prev !== null && n - prev > 1) {
@@ -325,26 +284,74 @@
     }
   }
 
-  // Hook paginator into existing search/filter flow.
-  // Easiest: re-run applyPage after every applySearch/applyCategoryFilter.
-  // We wrap without changing the body.
-  const _origApplySearch = applySearch;
-  applySearch = function (q) { _origApplySearch(q); applyPage(1); writeHashPage(1); };
-  const _origApplyCategoryFilter = applyCategoryFilter;
-  applyCategoryFilter = function () {
-    const visibleCount = _origApplyCategoryFilter() ?? entries.filter((e) => !e.dataset.hidden).length;
-    if (noResults) noResults.hidden = visibleCount > 0;
-    applyPage(1);
-    writeHashPage(1);
-  };
-  const _origSortEntries = sortEntries;
-  sortEntries = function (m) { _origSortEntries(m); applyPage(currentPage); };
-  const _origHideEmptyMonths = hideEmptyMonths;
-  hideEmptyMonths = function () { _origHideEmptyMonths(); };
+  window.addEventListener('hashchange', () => {
+    // A category-filter view has no query; only paginate the static list when
+    // the search results are not shown.
+    if (document.body.classList.contains('pf-searching')) return;
+    applyPage(readHashPage());
+  });
 
-  window.addEventListener('hashchange', () => applyPage(readHashPage()));
+  // ---------- PAGEFIND SEARCH GLUE ----------
+  // Responsibilities:
+  //   1. Toggle between the static archive list and the Pagefind results:
+  //      when a query is active, body gets .pf-searching so CSS hides the
+  //      static list / histogram / paginator and shows only the results. The
+  //      taxonomy chips at the top are never toggled.
+  //   2. Two-way sync with ?q= in the URL so searches are shareable/reloadable
+  //      (Pagefind 1.5.2 does not manage the URL itself).
+  //   3. Apply an incoming ?q= (e.g. from the retired /search/ redirect) on
+  //      first load by triggering the shared instance.
+  const params = new URLSearchParams(window.location.search);
+  const initialQuery = params.get('q');
+
+  // Pre-hide the static list before the (async) index loads to avoid a flash
+  // of the list followed by results.
+  if (initialQuery) document.body.classList.add('pf-searching');
+
+  function setSearching(on) {
+    document.body.classList.toggle('pf-searching', !!on);
+  }
+
+  function syncUrl(term) {
+    const url = new URL(window.location.href);
+    if (term) url.searchParams.set('q', term);
+    else url.searchParams.delete('q');
+    // Drop any #page= while searching so pagination and the results view do
+    // not fight over the URL.
+    if (term) url.hash = '';
+    try { history.replaceState(null, '', url.toString()); } catch (_) { /* ignore */ }
+  }
+
+  function initPagefind() {
+    const searchWrap = document.getElementById('pagefind-search');
+    if (!searchWrap || !window.PagefindComponents) return;
+
+    const manager = window.PagefindComponents.getInstanceManager();
+    // Get (not create) — the <pagefind-config instance="blog"> element has
+    // already created this instance during its own connectedCallback.
+    if (!manager.hasInstance('blog')) return;
+    const instance = manager.getInstance('blog');
+
+    // The <pagefind-input> updates its own field via the SAME 'search' hook,
+    // so reacting here for URL sync + list toggle introduces no feedback loop.
+    instance.on('search', (term) => {
+      const t = (term || '').trim();
+      setSearching(t.length > 0);
+      syncUrl(t);
+      if (t.length === 0) applyPage(readHashPage());  // restore static list view
+    });
+
+    // Apply an incoming ?q= once the instance is ready. triggerSearch drives
+    // the whole flow (input self-sync, our hook, results render).
+    if (initialQuery) instance.triggerSearch(initialQuery);
+  }
+
+  // The Pagefind component script is loaded with `defer` in <head>, so
+  // window.PagefindComponents and the custom element definitions exist before
+  // this body script (also deferred) runs.
+  initPagefind();
 
   // ---------- INIT ----------
   buildHistogram();
-  applyPage(readHashPage());
+  applyCategoryFilter();
 })();

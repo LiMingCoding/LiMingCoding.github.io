@@ -1,0 +1,98 @@
+/* Pagefind Component UI — theme bridge for PaperMod.
+ *
+ * The component ships its own --pf-* design tokens (public/pagefind/
+ * pagefind-component-ui.css). We override them to inherit PaperMod's palette
+ * so the inline search blends with the rest of the site in BOTH light and
+ * dark modes. PaperMod sets data-theme on <html> (light | dark | auto).
+ *
+ * The component renders into Light DOM (no shadow root), so these selectors
+ * reach its internals directly. We scope everything under #pagefind-search to
+ * avoid leaking styles and to add enough specificity to beat the component's
+ * own :is(*,#\#) prefixes where we genuinely want to restyle.
+ */
+
+/* ---- Token bridge: light ---- */
+#pagefind-search {
+    --pf-text: var(--primary);
+    --pf-text-secondary: var(--secondary);
+    --pf-text-muted: var(--secondary);
+    --pf-background: var(--theme);
+    --pf-border: var(--border);
+    --pf-border-focus: var(--secondary);
+    --pf-hover: var(--code-bg);
+    --pf-mark: var(--primary);
+    --pf-skeleton: var(--code-bg);
+    --pf-outline-focus: var(--secondary);
+    --pf-shadow-sm: none;
+    --pf-shadow-md: var(--shadow-code);
+    --pf-font: inherit;
+
+    --pf-input-height: 40px;
+    --pf-result-title-font-size: 1rem;
+    --pf-result-excerpt-font-size: 0.85rem;
+    --pf-summary-font-size: 0.8rem;
+    --pf-border-radius: 8px;
+
+    display: block;
+    width: 100%;
+    margin: 0.5rem 0 0.75rem;
+    font-size: 0.95rem;
+}
+
+/* ---- Token bridge: dark (explicit) ---- */
+html[data-theme="dark"] #pagefind-search {
+    --pf-background: var(--theme);
+}
+
+/* ---- Token bridge: dark (auto + system pref) ---- */
+@media (prefers-color-scheme: dark) {
+    html[data-theme="auto"] #pagefind-search {
+        --pf-background: var(--theme);
+    }
+}
+
+/* Input row: full-width, matches PaperMod search look */
+#pagefind-search pagefind-input .pf-input,
+#pagefind-search input.pf-input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Results list: compact, left-aligned, roomy line-height for CJK */
+#pagefind-search pagefind-results .pf-results,
+#pagefind-search ul.pf-results {
+    list-style: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+#pagefind-search .pf-search-result-title {
+    line-height: 1.5;
+}
+
+/* Highlighted <mark> — keep it subtle */
+#pagefind-search mark {
+    background: var(--entry);
+    color: var(--primary);
+    padding: 0 2px;
+    border-radius: 3px;
+}
+
+/* Searching state: hide the static archive list + tools so the page reads as
+ * a pure results view. Taxonomy chips at the top stay visible on purpose. */
+body.pf-searching .archive-list,
+body.pf-searching #archive-histogram,
+body.pf-searching #archive-paginator,
+body.pf-searching #archive-no-results,
+body.pf-searching .archive-controls--tools {
+    display: none !important;
+}
+
+/* Not searching: the results area collapses (Pagefind renders nothing until a
+ * query, but keep the summary line which carries the default message). */
+body:not(.pf-searching) pagefind-results {
+    margin-top: 0;
+}
