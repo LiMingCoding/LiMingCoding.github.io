@@ -8,7 +8,28 @@ title: LiMing编程笔记
 
 defaultContentLanguage: zh-cn
 defaultContentLanguageInSubdir: false
-languageCode: zh-CN
+
+# ---------- 多语言 ----------
+# 中文为默认语言，内容在 /posts/...（URL 不变）；英文内容放 content/en/...，
+# 渲染到 /en/posts/...。翻译某个 post 时新建同名 *.en.md 并加相同的
+# translationKey，PaperMod 的 language toggle 会自动关联。
+languages:
+  zh-cn:
+    languageName: 简体中文
+    weight: 1
+    languageCode: zh-CN
+    title: "LiMing编程笔记"
+    params:
+      displayFullLangName: true
+      description: "技术学习笔记 · 实战 · 调优"
+  en:
+    languageName: English
+    weight: 2
+    languageCode: en-US
+    title: "LiMing's Coding Notes"
+    params:
+      displayFullLangName: true
+      description: "Tech learning notes · practical · tuned"
 
 # ---------- Taxonomies ----------
 # Hugo 默认是 categories + tags；显式列出以保留默认并新增 series。
@@ -51,6 +72,8 @@ params:
   ShowRssButtonInSiteCanal: true
   ShowAllCardsInArchive: false
   comments: false
+  math: true      # 启用 KaTeX（行内 $...$ + 块级 $$...$$）
+  mermaid: true   # 启用 Mermaid shortcode
 
   author: LiMingCoding
 
