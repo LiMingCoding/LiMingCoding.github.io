@@ -75,8 +75,8 @@ params:
   giscus:
     repo: "LiMingCoding/LiMingCoding.github.io"
     repoId: "387329406"
-    category: "announcements"
-    categoryId: "DIC_kwDOFxYtfs4DEf3i"
+    category: "general"
+    categoryId: "DIC_kwDOFxYtfs4DEf3j"
     mapping: "pathname"
     strict: "0"
     reactionsEnabled: "1"
