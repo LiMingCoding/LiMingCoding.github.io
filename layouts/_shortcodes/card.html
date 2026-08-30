@@ -1,0 +1,40 @@
+{{- /*
+  Card shortcode: image + title + subtitle + body, optionally clickable.
+
+  Usage:
+    {{< card title="Hugo" image="/img/hugo.png" link="https://gohugo.io/" subtitle="静态网站生成器" icon="🔗" >}}
+    描述文本
+    {{< /card >}}
+
+  Params:
+    title    (string) required, card title
+    image    (string) optional, cover image URL (relative or absolute)
+    link     (string) optional, makes the whole card a clickable anchor
+    subtitle (string) optional, subtitle line
+    icon     (string) optional, emoji shown before the title
+    Inner            optional, free-form card body
+*/ -}}
+{{- $title := .Get "title" | default "Untitled" -}}
+{{- $image := .Get "image" -}}
+{{- $link := .Get "link" -}}
+{{- $subtitle := .Get "subtitle" -}}
+{{- $icon := .Get "icon" -}}
+<div class="card{{ with $link }} card-linked{{ end }}">
+  {{- with $image }}
+  <div class="card-image">
+    <img src="{{ . }}" alt="{{ $title }}" loading="lazy" />
+  </div>
+  {{- end }}
+  <div class="card-body">
+    <div class="card-title">
+      {{- with $icon }}<span class="card-icon">{{ . }}</span>{{ end }}
+      {{- if $link }}<a href="{{ $link }}" target="_blank" rel="noopener noreferrer">{{ $title }}</a>{{ else }}<span>{{ $title }}</span>{{ end }}
+    </div>
+    {{- with $subtitle }}
+    <div class="card-subtitle">{{ . }}</div>
+    {{- end }}
+    {{- with .Inner }}
+    <div class="card-content">{{ . | safeHTML }}</div>
+    {{- end }}
+  </div>
+</div>
