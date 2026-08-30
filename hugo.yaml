@@ -1,10 +1,10 @@
 # =============================================================
-#  黎明编程笔记 — Hugo 站点配置
+#  LiMing编程笔记 — Hugo 站点配置
 #  格式: hugo.yaml；基于 PaperMod 主题推荐写法。
 # =============================================================
 
 baseURL: "https://limingcoding.github.io/"
-title: 黎明编程笔记
+title: LiMing编程笔记
 titleCase: "first upper"
 
 defaultContentLanguage: zh-cn
@@ -44,7 +44,7 @@ params:
 
   profileMode:
     enabled: true
-    title: "黎明编程笔记"
+    title: "LiMing编程笔记"
     subtitle: "技术学习笔记 · 实战 · 调优"
     imageUrl: "/img/avatar.svg"
     imageWidth: 120
@@ -64,7 +64,7 @@ params:
       url: "https://github.com/LiMingCoding"
 
   homeInfoParams:
-    Title: "欢迎来到 黎明编程笔记 👋"
+    Title: "欢迎来到 LiMing编程笔记 👋"
     Content: |
       这里记录我在学习中整理的编程笔记、踩坑经验和工具使用心得。
       偏向实战、调优思路，目标是写完就能用上。
@@ -113,7 +113,7 @@ outputs:
   home:
     - HTML
     - RSS
-    - JSON          # PaperMod 站内搜索的索引（/index.json）
+    - JSON # PaperMod 站内搜索的索引（/index.json）
   section:
     - HTML
     - RSS

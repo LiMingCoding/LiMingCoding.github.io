@@ -1,4 +1,4 @@
-# 黎明编程笔记
+# LiMing编程笔记
 
 > 个人技术博客 — Hugo + PaperMod，托管于 GitHub Pages。
 
@@ -10,7 +10,7 @@
 
 | 项目 | 版本 / 说明 |
 |---|---|
-| Hugo | extended `0.131.0` |
+| Hugo | extended `0.165.0` |
 | 主题 | PaperMod（git submodule 引入） |
 | 部署 | GitHub Actions → GitHub Pages |
 | 搜索 | Fuse.js + 自定义摘要片段 |
@@ -18,7 +18,7 @@
 ## 本地预览
 
 ```bash
-# 安装 Hugo extended 0.131.x
+# 安装 Hugo extended 0.165.x
 # macOS:  brew install hugo
 # Debian: sudo apt install hugo
 # 其他:   https://github.com/gohugoio/hugo/releases
