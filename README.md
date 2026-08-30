@@ -17,12 +17,34 @@
 
 ## 本地预览
 
-```bash
-# 安装 Hugo extended 0.165.x
-# macOS:  brew install hugo
-# Debian: sudo apt install hugo
-# 其他:   https://github.com/gohugoio/hugo/releases
+### 安装 Hugo
 
+需要 **Hugo extended `0.165.0` 或更新**。PaperMod 主题在 `0.146.0+` 才有适配，低于这个版本 build 会失败并报 `partial "head.html" not found`。
+
+最稳的方式：直接下载官方 binary 到 `~/.local/bin/`（不用 sudo、不会污染系统包管理器）：
+
+```bash
+# Linux x86_64
+HUGO_VERSION=0.165.0
+mkdir -p ~/.local/bin
+curl -L "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.tar.gz" \
+  | tar xz -C ~/.local/bin hugo
+~/.local/bin/hugo version
+# 确认 ~/.local/bin 在 $PATH 里（多数 Linux 默认就有）
+```
+
+包管理器（**注意系统源可能过旧**）：
+
+```bash
+# macOS:    brew install hugo                  # 通常够新
+# Debian:   apt 源里的 hugo 经常停在 0.131，build 会失败
+#           建议走上面 binary 路线，或加官方源:
+#           https://dl.hugo.dev/
+```
+
+### 启动预览
+
+```bash
 git clone --recurse-submodules https://github.com/LiMingCoding/LiMingCoding.github.io.git
 cd LiMingCoding.github.io
 hugo server -D
@@ -34,6 +56,8 @@ hugo server -D
 > ```bash
 > git submodule update --init --recursive
 > ```
+>
+> **build 报 `partial "head.html" not found`？** 说明你本地的 hugo 太旧（`< 0.146`），按上面「安装 Hugo」装一个新版再试。
 
 ## 写一篇新文章
 
