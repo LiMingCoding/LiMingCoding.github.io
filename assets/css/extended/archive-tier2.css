@@ -1,9 +1,10 @@
 /* ===== Archive page — Tier 2 =====
-   Pure-CSS category filter pills + compact/detailed view toggle.
-   No JavaScript — uses :checked sibling selectors.
+   Category filter (button-driven, JS-managed active state) +
+   compact/detailed view toggle (radio-driven, CSS sibling selectors).
 */
 
-/* Hide the radio inputs themselves (they only exist to be targets for labels). */
+/* Hide the radio inputs themselves (they only exist to be targets for labels
+   for the view toggle). */
 .archive-radio {
     position: absolute;
     opacity: 0;
@@ -34,7 +35,7 @@
     align-items: center;
 }
 
-/* Pill base style */
+/* Pill base style (covers both <button> category pills and <label> view pills). */
 .archive-pill {
     display: inline-flex;
     align-items: center;
@@ -55,50 +56,13 @@
     border-color: var(--secondary);
 }
 
-/* Active state via :checked sibling selectors.
-   The toolbar's pills (label.archive-pill) come AFTER their corresponding
-   radio (input.archive-radio) in the DOM, so #id:checked ~ .archive-toolbar
-   chain reaches them. */
-
-/* Per-category filter active states. */
-#archive-cat-all:checked ~ .archive-toolbar label[for="archive-cat-all"] {
+/* Active state for category buttons. JS toggles the .archive-pill--active
+   class on click. Adding a new category needs NO CSS update — the rule below
+   is generic. */
+.archive-pill--active {
     color: #fff;
     background: var(--secondary);
     border-color: var(--secondary);
-}
-
-/* Generated-style rule: each non-"all" category radio selects its own pill.
-   We can't loop in CSS, so we list known categories explicitly. */
-#archive-cat-随笔:checked ~ .archive-toolbar label[for="archive-cat-随笔"],
-#archive-cat-工具:checked ~ .archive-toolbar label[for="archive-cat-工具"],
-#archive-cat-技术:checked ~ .archive-toolbar label[for="archive-cat-技术"] {
-    color: #fff;
-    background: var(--secondary);
-    border-color: var(--secondary);
-}
-
-/* When a specific category is selected, hide posts that aren't in it. */
-.archive-radio[id^="archive-cat-"]:not(#archive-cat-all):checked ~ .archive-list .archive-entry {
-    display: none;
-}
-#archive-cat-随笔:checked ~ .archive-list .archive-entry--cat-随笔,
-#archive-cat-工具:checked ~ .archive-list .archive-entry--cat-工具,
-#archive-cat-技术:checked ~ .archive-list .archive-entry--cat-技术 {
-    display: block;
-}
-
-/* Hide empty year/month groups when their children are all hidden.
-   CSS doesn't easily check for "all children hidden", so we just hide
-   the headers when no matching entry exists within. */
-#archive-cat-随笔:checked ~ .archive-list .archive-month:not(:has(.archive-entry--cat-随笔)),
-#archive-cat-工具:checked ~ .archive-list .archive-month:not(:has(.archive-entry--cat-工具)),
-#archive-cat-技术:checked ~ .archive-list .archive-month:not(:has(.archive-entry--cat-技术)) {
-    display: none;
-}
-#archive-cat-随笔:checked ~ .archive-list .archive-year:not(:has(.archive-month)),
-#archive-cat-工具:checked ~ .archive-list .archive-year:not(:has(.archive-month)),
-#archive-cat-技术:checked ~ .archive-list .archive-year:not(:has(.archive-month)) {
-    display: none;
 }
 
 /* View toggle: detailed (default) shows excerpt + chips; compact hides them. */
@@ -128,8 +92,7 @@
     font-size: 0.98em;
 }
 
-/* When JS is disabled, show the count of hidden posts (best-effort fallback).
-   For now we just hide "no results" — JS in tier 3 will toggle this properly. */
+/* No-results placeholder (hidden by default; JS in tier 3 toggles this). */
 #archive-no-results {
     display: none;
     padding: 1rem;

@@ -21,27 +21,56 @@
 
   function applySearch(query) {
     const q = query.trim().toLowerCase();
-    let visibleCount = 0;
     entries.forEach((el) => {
       if (!q) {
-        el.dataset.hidden = '';
-        visibleCount++;
+        el.dataset.searchHidden = '';
         return;
       }
       const title = (el.dataset.title || '').toLowerCase();
       const excerpt = (el.dataset.excerpt || '').toLowerCase();
       const cat = (el.dataset.category || '').toLowerCase();
       const match = title.includes(q) || excerpt.includes(q) || cat.includes(q);
-      el.dataset.hidden = match ? '' : '1';
-      if (match) visibleCount++;
+      el.dataset.searchHidden = match ? '' : '1';
     });
-    if (noResults) noResults.hidden = visibleCount > 0;
-    hideEmptyMonths();
+    applyCategoryFilter();
   }
 
   if (searchInput) {
     searchInput.addEventListener('input', (e) => applySearch(e.target.value));
   }
+
+  // ---------- CATEGORY FILTER ----------
+  // Active category is stored on the button via .archive-pill--active.
+  // Empty string '' means "show all". Adding a new category in Hugo's
+  // frontmatter automatically surfaces a button here — no JS or CSS change.
+  let activeCategory = '';
+
+  function applyCategoryFilter() {
+    entries.forEach((el) => {
+      // Preserve search-hidden state; just add category mismatch on top.
+      const searchHidden = el.dataset.searchHidden === '1';
+      const cat = el.dataset.category || '';
+      const catMatch = !activeCategory || cat === activeCategory;
+      el.dataset.hidden = (!catMatch || searchHidden) ? '1' : '';
+    });
+    hideEmptyMonths();
+  }
+
+  const catPills = document.querySelectorAll('.archive-pill--cat');
+  catPills.forEach((p) => {
+    p.addEventListener('click', () => {
+      // Toggle active state on pills
+      catPills.forEach((q) => {
+        q.classList.remove('archive-pill--active');
+        q.setAttribute('aria-pressed', 'false');
+      });
+      p.classList.add('archive-pill--active');
+      p.setAttribute('aria-pressed', 'true');
+
+      activeCategory = p.dataset.cat || '';
+      applyCategoryFilter();
+    });
+  });
 
   // ---------- SORT ----------
   const sortSelect = document.getElementById('archive-sort-select');
@@ -296,11 +325,18 @@
     }
   }
 
-  // Hook paginator into existing search/sort flow.
-  // Easiest: re-run applyPage after every applySearch/sortEntries/hideEmptyMonths.
-  // We add it as a wrapper to applySearch without changing its body.
+  // Hook paginator into existing search/filter flow.
+  // Easiest: re-run applyPage after every applySearch/applyCategoryFilter.
+  // We wrap without changing the body.
   const _origApplySearch = applySearch;
   applySearch = function (q) { _origApplySearch(q); applyPage(1); writeHashPage(1); };
+  const _origApplyCategoryFilter = applyCategoryFilter;
+  applyCategoryFilter = function () {
+    const visibleCount = _origApplyCategoryFilter() ?? entries.filter((e) => !e.dataset.hidden).length;
+    if (noResults) noResults.hidden = visibleCount > 0;
+    applyPage(1);
+    writeHashPage(1);
+  };
   const _origSortEntries = sortEntries;
   sortEntries = function (m) { _origSortEntries(m); applyPage(currentPage); };
   const _origHideEmptyMonths = hideEmptyMonths;

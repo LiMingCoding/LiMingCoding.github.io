@@ -1,8 +1,13 @@
 {{- /*
-    Tier 2 — pure-CSS filter pills + compact/detailed view toggle.
+    Tier 2 — category filter + compact/detailed view toggle.
 
-    Strategy: hidden <input type="radio"> buttons control visibility of
-    .archive-entry elements via sibling selectors. No JavaScript.
+    Category filter is a list of plain <button data-cat="..."> elements.
+    Selection state is managed in JS (active class), so adding a new
+    category requires no CSS or HTML changes — just a new categories:
+    frontmatter value on any post.
+
+    View toggle stays as radio+label because it's binary and CSS-driven
+    sibling selectors are still the simplest mechanism there.
 
     Coordinates with archives.html:
       - Each .archive-entry has class archive-entry--cat-<cat-slug>
@@ -21,23 +26,21 @@
   {{- end -}}
 {{- end -}}
 
-{{- /* Hidden radio buttons drive both the filter and the view toggle.
-       Putting them as a single block before the toolbar makes the
-       sibling selector chain short. */ -}}
-<input type="radio" name="archive-cat" id="archive-cat-all" class="archive-radio" checked>
-{{- range $cats }}
-<input type="radio" name="archive-cat" id="archive-cat-{{ . }}" class="archive-radio">
-{{- end }}
-
+{{- /* View toggle: hidden radios driven by CSS sibling selectors. */ -}}
 <input type="radio" name="archive-view" id="archive-view-detailed" class="archive-radio" checked>
 <input type="radio" name="archive-view" id="archive-view-compact" class="archive-radio">
 
 <div class="archive-toolbar">
   <div class="archive-cat-filter" role="group" aria-label="按分类筛选">
-    <label for="archive-cat-all" class="archive-pill archive-pill--cat">全部</label>
+    <button type="button" class="archive-pill archive-pill--cat archive-pill--active"
+            data-cat="" aria-pressed="true">
+      全部
+    </button>
     {{- range $cats }}
-    <label for="archive-cat-{{ . }}" class="archive-pill archive-pill--cat"
-           data-cat="{{ . }}">{{ . }}</label>
+    <button type="button" class="archive-pill archive-pill--cat"
+            data-cat="{{ . }}" aria-pressed="false">
+      {{ . }}
+    </button>
     {{- end }}
   </div>
 
