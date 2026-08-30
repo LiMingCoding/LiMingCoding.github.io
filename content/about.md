@@ -1,6 +1,6 @@
 ---
 title: 关于
-description: 关于 黎明编程笔记 与作者 LiMingCoding。
+description: 关于 LiMing编程笔记 与作者 LiMingCoding。
 slug: about
 layout: single
 ShowBreadCrumbs: false
@@ -17,7 +17,7 @@ ShowTOC: false
 
 ## 关注的方向
 
-- Python / 脚本工具
+- Python / Rust
 - Web / 前端
 - 系统与运维
 
