@@ -1,0 +1,118 @@
+# =============================================================
+#  黎明编程笔记 — Hugo 站点配置
+#  格式: hugo.yaml；基于 PaperMod 主题推荐写法。
+# =============================================================
+
+baseURL: "https://limingcoding.github.io/"
+title: 黎明编程笔记
+titleCase: "first upper"
+
+defaultContentLanguage: zh-cn
+defaultContentLanguageInSubdir: false
+languageCode: zh-CN
+
+# ---------- PaperMod 主题参数 ----------
+params:
+  env: production
+  description: "记录学习过程中整理的编程、开发与工具使用笔记。"
+  keywords:
+    - 编程
+    - 技术笔记
+    - LiMingCoding
+    - Hugo
+    - PaperMod
+
+  defaultTheme: auto
+  ShowThemeToggleButton: true
+  ShowReadingTime: true
+  ShowShareButtons: true
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowRssButtonInSiteCanal: true
+  ShowAllCardsInArchive: false
+  comments: false
+
+  author: LiMingCoding
+
+  profileMode:
+    enabled: true
+    title: "黎明编程笔记"
+    subtitle: "技术学习笔记 · 实战 · 调优"
+    imageUrl: "/img/avatar.svg"
+    imageWidth: 120
+    imageHeight: 120
+    buttons:
+      - name: "归档"
+        url: "/archives/"
+      - name: "关于"
+        url: "/about/"
+      - name: "GitHub"
+        url: "https://github.com/LiMingCoding"
+        weight: 10
+
+  socialIcons:
+    - name: github
+      title: "GitHub"
+      url: "https://github.com/LiMingCoding"
+
+  homeInfoParams:
+    Title: "欢迎来到 黎明编程笔记 👋"
+    Content: |
+      这里记录我在学习中整理的编程笔记、踩坑经验和工具使用心得。
+      偏向实战、调优思路，目标是写完就能用上。
+
+  mainSections:
+    - posts
+
+# ---------- 菜单 ----------
+menu:
+  main:
+    - identifier: home
+      name: 首页
+      url: /
+      weight: 1
+    - identifier: archives
+      name: 归档
+      url: /archives/
+      weight: 3
+    - identifier: search
+      name: 搜索
+      url: /search/
+      weight: 5
+    - identifier: about
+      name: 关于
+      url: /about/
+      weight: 7
+
+# ---------- Markdown ----------
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  highlight:
+    noClasses: false
+    lineNos: true
+    codeFences: true
+    guessSyntax: true
+
+# ---------- 输出 / 分页 / 主题 ----------
+outputFormats:
+  RSS:
+    mediatype: application/rss+xml
+    baseName: index
+
+outputs:
+  home:
+    - HTML
+    - RSS
+
+pagination:
+  pagerSize: 10
+
+theme: PaperMod
+
+permalinks:
+  posts: /posts/:slug/
+  page: /:slug/
+  about: /about/

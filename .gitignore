@@ -1,0 +1,19 @@
+# Hugo
+public/
+resources/_gen/
+.hugo_build.lock
+.hugo_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+
+# Node (optional)
+node_modules/
+
+# Logs
+*.log
