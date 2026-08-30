@@ -1,0 +1,33 @@
+{{- /*
+    Stats summary bar — sits at the top of the archive page.
+    Shows total post count, tag count, series count, total word count.
+*/}}
+
+{{- $pages := where site.RegularPages "Type" "in" site.Params.mainSections }}
+{{- $totalPosts := len $pages }}
+{{- $totalTags := len site.Taxonomies.tags }}
+{{- $totalSeries := len site.Taxonomies.series }}
+{{- $totalWords := 0 }}
+{{- range $pages }}{{ $totalWords = add $totalWords (.PlainWords | len) }}{{ end }}
+
+<div class="archive-stats">
+  <span class="archive-stat">
+    <span class="archive-stat-num">{{ $totalPosts }}</span>
+    <span class="archive-stat-label">篇文章</span>
+  </span>
+  <span class="archive-stat-sep">·</span>
+  <span class="archive-stat">
+    <span class="archive-stat-num">{{ $totalTags }}</span>
+    <span class="archive-stat-label">个标签</span>
+  </span>
+  <span class="archive-stat-sep">·</span>
+  <span class="archive-stat">
+    <span class="archive-stat-num">{{ $totalSeries }}</span>
+    <span class="archive-stat-label">个系列</span>
+  </span>
+  <span class="archive-stat-sep">·</span>
+  <span class="archive-stat">
+    <span class="archive-stat-num">~{{ math.Round (div (float $totalWords) 1000) }}k</span>
+    <span class="archive-stat-label">总字数</span>
+  </span>
+</div>

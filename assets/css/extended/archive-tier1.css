@@ -1,0 +1,184 @@
+/* ===== Archive page — Tier 1 =====
+   Visual: excerpts, chips, series badge, stats bar, color-coded borders
+*/
+
+/* Stats summary bar */
+.archive-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.8rem;
+    align-items: center;
+    margin: 1rem 0 1.5rem;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius, 8px);
+    background: var(--entry);
+    font-size: 0.9em;
+    color: var(--secondary);
+}
+
+.archive-stat {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.3rem;
+}
+
+.archive-stat-num {
+    font-weight: 600;
+    color: var(--primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.archive-stat-sep {
+    color: var(--border);
+    margin: 0 0.1rem;
+}
+
+/* Archive year/month header tweaks (extend PaperMod's) */
+.archive-year {
+    margin-top: 2rem;
+}
+
+.archive-year:not(:last-of-type) {
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 1rem;
+}
+
+.archive-month {
+    display: flex;
+    align-items: flex-start;
+    padding: 0.6rem 0;
+    flex-wrap: wrap;
+}
+
+.archive-month-header {
+    margin: 0.5rem 0;
+    width: 200px;
+    font-size: 1.05em;
+}
+
+.archive-month:not(:last-of-type) {
+    border-bottom: 1px dashed var(--border);
+}
+
+/* Archive entry — extends PaperMod's compact entry with our additions */
+.archive-entry {
+    position: relative;
+    padding: 0.6rem 0.8rem 0.6rem 1rem;
+    margin: 0.6rem 0;
+    border-left: 3px solid var(--border);     /* fallback color; overridden below */
+    border-radius: 0 var(--radius, 6px) var(--radius, 6px) 0;
+    background: var(--entry);
+    transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.archive-entry:hover {
+    transform: translateX(2px);
+}
+
+.archive-entry-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.archive-entry-title {
+    margin: 0;
+    font-weight: 500;
+    font-size: 1.05em;
+    line-height: 1.3;
+}
+
+.archive-entry-link {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.archive-entry-link:hover {
+    color: var(--secondary);
+}
+
+/* Series badge */
+.archive-series-badge {
+    display: inline-block;
+    padding: 0.1rem 0.5rem;
+    font-size: 0.78em;
+    color: var(--secondary);
+    background: rgba(150, 150, 150, 0.12);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.archive-series-badge:hover {
+    color: var(--theme);
+    background: var(--secondary);
+    border-color: var(--secondary);
+}
+
+/* NEW badge (also rendered server-side for non-JS users; CSS stays for both) */
+.archive-new-badge {
+    display: inline-block;
+    padding: 0.1rem 0.5rem;
+    font-size: 0.7em;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+    vertical-align: middle;
+}
+
+/* Excerpt preview */
+.archive-excerpt {
+    margin: 0.3rem 0 0.4rem;
+    color: var(--secondary);
+    font-size: 0.9em;
+    line-height: 1.5;
+    opacity: 0.85;
+}
+
+/* Meta line: keep PaperMod's post_meta, add chips after */
+.archive-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--secondary);
+    font-size: 0.82em;
+}
+
+/* Chips: category + tag */
+.archive-chip {
+    display: inline-block;
+    padding: 0.1rem 0.5rem;
+    font-size: 0.85em;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+.archive-chip--cat {
+    background: rgba(150, 150, 150, 0.15);
+    color: var(--primary);
+    font-weight: 500;
+}
+
+.archive-chip--tag {
+    color: var(--secondary);
+    font-size: 0.8em;
+    opacity: 0.75;
+}
+
+/* Category → border color. Matches tags-rainbow.css palette. */
+.archive-entry--cat-随笔 { border-left-color: #f59e0b; }   /* amber  */
+.archive-entry--cat-工具 { border-left-color: #06b6d4; }   /* cyan   */
+.archive-entry--cat-技术 { border-left-color: #8b5cf6; }   /* violet */
+.archive-entry--cat-uncategorized { border-left-color: var(--border); }
+
+/* Match chip background to category color (subtle tint) */
+.archive-entry--cat-随笔 .archive-chip--cat { background: rgba(245, 158, 11, 0.15); }
+.archive-entry--cat-工具 .archive-chip--cat { background: rgba(6, 182, 212, 0.15); }
+.archive-entry--cat-技术 .archive-chip--cat { background: rgba(139, 92, 246, 0.15); }

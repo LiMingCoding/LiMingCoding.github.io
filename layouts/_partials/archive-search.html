@@ -1,0 +1,26 @@
+{{- /*
+    Tier 3 — search box UI + sort dropdown.
+    The histogram is rendered by JS into #archive-histogram.
+    The "no results" placeholder is shown/hidden by JS based on search.
+*/}}
+
+<div class="archive-controls">
+  <input type="search"
+         id="archive-search-input"
+         class="archive-search-input"
+         placeholder="🔍 搜索标题或摘要..."
+         aria-label="搜索归档文章">
+
+  <select id="archive-sort-select" class="archive-sort-select" aria-label="排序方式">
+    <option value="date-desc">最新优先</option>
+    <option value="date-asc">最早优先</option>
+    <option value="title-asc">标题 A-Z</option>
+    <option value="title-desc">标题 Z-A</option>
+    <option value="reading-asc">阅读时长 短→长</option>
+    <option value="reading-desc">阅读时长 长→短</option>
+  </select>
+</div>
+
+<div id="archive-no-results" class="archive-no-results" hidden>
+  没找到匹配的文章。换个关键词试试？
+</div>

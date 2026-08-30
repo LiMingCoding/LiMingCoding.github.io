@@ -1,0 +1,139 @@
+/* ===== Archive page — Tier 2 =====
+   Pure-CSS category filter pills + compact/detailed view toggle.
+   No JavaScript — uses :checked sibling selectors.
+*/
+
+/* Hide the radio inputs themselves (they only exist to be targets for labels). */
+.archive-radio {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+}
+
+/* Toolbar layout */
+.archive-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 1.5rem;
+    align-items: center;
+    justify-content: space-between;
+    margin: 1rem 0 1.5rem;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius, 8px);
+    background: var(--entry);
+}
+
+.archive-cat-filter,
+.archive-view-toggle {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: center;
+}
+
+/* Pill base style */
+.archive-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 0.85rem;
+    font-size: 0.85em;
+    font-weight: 500;
+    color: var(--secondary);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s ease;
+}
+
+.archive-pill:hover {
+    color: var(--primary);
+    border-color: var(--secondary);
+}
+
+/* Active state via :checked sibling selectors.
+   The toolbar's pills (label.archive-pill) come AFTER their corresponding
+   radio (input.archive-radio) in the DOM, so #id:checked ~ .archive-toolbar
+   chain reaches them. */
+
+/* Per-category filter active states. */
+#archive-cat-all:checked ~ .archive-toolbar label[for="archive-cat-all"] {
+    color: #fff;
+    background: var(--secondary);
+    border-color: var(--secondary);
+}
+
+/* Generated-style rule: each non-"all" category radio selects its own pill.
+   We can't loop in CSS, so we list known categories explicitly. */
+#archive-cat-随笔:checked ~ .archive-toolbar label[for="archive-cat-随笔"],
+#archive-cat-工具:checked ~ .archive-toolbar label[for="archive-cat-工具"],
+#archive-cat-技术:checked ~ .archive-toolbar label[for="archive-cat-技术"] {
+    color: #fff;
+    background: var(--secondary);
+    border-color: var(--secondary);
+}
+
+/* When a specific category is selected, hide posts that aren't in it. */
+.archive-radio[id^="archive-cat-"]:checked ~ .archive-list .archive-entry {
+    display: none;
+}
+#archive-cat-随笔:checked ~ .archive-list .archive-entry--cat-随笔,
+#archive-cat-工具:checked ~ .archive-list .archive-entry--cat-工具,
+#archive-cat-技术:checked ~ .archive-list .archive-entry--cat-技术 {
+    display: block;
+}
+
+/* Hide empty year/month groups when their children are all hidden.
+   CSS doesn't easily check for "all children hidden", so we just hide
+   the headers when no matching entry exists within. */
+#archive-cat-随笔:checked ~ .archive-list .archive-month:not(:has(.archive-entry--cat-随笔)),
+#archive-cat-工具:checked ~ .archive-list .archive-month:not(:has(.archive-entry--cat-工具)),
+#archive-cat-技术:checked ~ .archive-list .archive-month:not(:has(.archive-entry--cat-技术)) {
+    display: none;
+}
+#archive-cat-随笔:checked ~ .archive-list .archive-year:not(:has(.archive-month)),
+#archive-cat-工具:checked ~ .archive-list .archive-year:not(:has(.archive-month)),
+#archive-cat-技术:checked ~ .archive-list .archive-year:not(:has(.archive-month)) {
+    display: none;
+}
+
+/* View toggle: detailed (default) shows excerpt + chips; compact hides them. */
+.archive-radio[id^="archive-view-"]:checked ~ .archive-toolbar .archive-pill--view {
+    color: var(--secondary);
+}
+
+#archive-view-detailed:checked ~ .archive-toolbar label[for="archive-view-detailed"],
+#archive-view-compact:checked ~ .archive-toolbar label[for="archive-view-compact"] {
+    color: #fff;
+    background: var(--secondary);
+    border-color: var(--secondary);
+}
+
+/* Compact mode: hide excerpt and meta chips. */
+#archive-view-compact:checked ~ .archive-list .archive-excerpt,
+#archive-view-compact:checked ~ .archive-list .archive-meta {
+    display: none;
+}
+
+#archive-view-compact:checked ~ .archive-list .archive-entry {
+    padding: 0.4rem 0.8rem;
+    margin: 0.3rem 0;
+}
+
+#archive-view-compact:checked ~ .archive-list .archive-entry-title {
+    font-size: 0.98em;
+}
+
+/* When JS is disabled, show the count of hidden posts (best-effort fallback).
+   For now we just hide "no results" — JS in tier 3 will toggle this properly. */
+#archive-no-results {
+    display: none;
+    padding: 1rem;
+    text-align: center;
+    color: var(--secondary);
+    font-style: italic;
+}

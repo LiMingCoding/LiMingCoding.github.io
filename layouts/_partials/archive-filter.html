@@ -1,0 +1,52 @@
+{{- /*
+    Tier 2 — pure-CSS filter pills + compact/detailed view toggle.
+
+    Strategy: hidden <input type="radio"> buttons control visibility of
+    .archive-entry elements via sibling selectors. No JavaScript.
+
+    Coordinates with archives.html:
+      - Each .archive-entry has class archive-entry--cat-<cat-slug>
+      - Each archive-entry has data-category="<cat-name>" (already in template)
+*/}}
+
+{{- /* Collect unique category names from all posts. */ -}}
+{{- $cats := slice -}}
+{{- range where site.RegularPages "Type" "in" site.Params.mainSections -}}
+  {{- with .Params.categories -}}
+    {{- range . -}}
+      {{- if not (in $cats .) -}}
+        {{- $cats = $cats | append . -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* Hidden radio buttons drive both the filter and the view toggle.
+       Putting them as a single block before the toolbar makes the
+       sibling selector chain short. */ -}}
+<input type="radio" name="archive-cat" id="archive-cat-all" class="archive-radio" checked>
+{{- range $cats }}
+<input type="radio" name="archive-cat" id="archive-cat-{{ . | urlize }}" class="archive-radio">
+{{- end }}
+
+<input type="radio" name="archive-view" id="archive-view-detailed" class="archive-radio" checked>
+<input type="radio" name="archive-view" id="archive-view-compact" class="archive-radio">
+
+<div class="archive-toolbar">
+  <div class="archive-cat-filter" role="group" aria-label="按分类筛选">
+    <label for="archive-cat-all" class="archive-pill archive-pill--cat">全部</label>
+    {{- range $cats }}
+    <label for="archive-cat-{{ . | urlize }}" class="archive-pill archive-pill--cat"
+           data-cat="{{ . | urlize }}">{{ . }}</label>
+    {{- end }}
+  </div>
+
+  <div class="archive-view-toggle" role="group" aria-label="视图密度">
+    <label for="archive-view-detailed" class="archive-pill archive-pill--view" title="显示摘要和标签">
+      详细
+    </label>
+    <label for="archive-view-compact" class="archive-pill archive-pill--view" title="只显示标题">
+      紧凑
+    </label>
+  </div>
+</div>

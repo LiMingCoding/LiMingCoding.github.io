@@ -1,0 +1,123 @@
+{{- /*
+    Override of PaperMod's archives.html (themes/PaperMod/layouts/archives.html).
+
+    Adds 5 enhancements on top of the basic year/month grouping:
+      1. Excerpt preview under each title
+      2. Category + tag chips
+      3. Series badge (if post is in a series)
+      4. Stats summary bar (via archive-stats.html partial)
+      5. Color-coded left border by primary category
+
+    The other two tiers (filter, search/sort/histogram) are wired in via
+    partials below — they add their own UI and JS without touching this template.
+*/}}
+
+{{- define "main" }}
+
+<header class="page-header">
+  <h1>{{ .Title }}</h1>
+  {{- with .Description }}
+  <div class="post-description">{{ . }}</div>
+  {{- end }}
+</header>
+
+{{- /* Tier 1: stats summary bar */ -}}
+{{- partial "archive-stats.html" . }}
+
+{{- /* Tier 2: filter pills + view toggle */ -}}
+{{- partial "archive-filter.html" . }}
+
+{{- /* Tier 3: search box + sort + histogram (UI only; JS at end) */ -}}
+{{- partial "archive-search.html" . }}
+
+{{- $pages := where site.RegularPages "Type" "in" site.Params.mainSections }}
+{{- if site.Params.ShowAllPagesInArchive }}
+{{- $pages = site.RegularPages }}
+{{- end }}
+
+<div class="archive-list">
+{{- range $pages.GroupByPublishDate "2006" }}
+{{- if ne .Key "0001" }}
+<div class="archive-year">
+  {{- $year := replace .Key "0001" "" }}
+  <h2 class="archive-year-header" id="{{ $year }}">
+    <a class="archive-header-link" href="#{{ $year }}">{{ $year }}</a>
+    <sup class="archive-count">{{ len .Pages }}</sup>
+  </h2>
+
+  {{- range .Pages.GroupByDate "January" }}
+  <div class="archive-month">
+    <h3 class="archive-month-header" id="{{ $year }}-{{ .Key }}">
+      <a class="archive-header-link" href="#{{ $year }}-{{ .Key }}">{{ .Key }}</a>
+      <sup class="archive-count">{{ len .Pages }}</sup>
+    </h3>
+
+    <div class="archive-posts">
+      {{- range .Pages }}
+      {{- if eq .Kind "page" }}
+      {{- $cat := "" }}
+      {{- with .Params.categories }}{{ $cat = index . 0 }}{{ end }}
+      {{- $catSlug := default "uncategorized" ($cat | urlize) }}
+      <article class="archive-entry archive-entry--cat-{{ $catSlug }}"
+               data-title="{{ .Title | plainify }}"
+               data-excerpt="{{ .Summary | plainify }}"
+               data-date="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}"
+               data-reading-time="{{ if .ReadingTime }}{{ .ReadingTime }}{{ else }}1{{ end }}"
+               data-category="{{ $cat }}">
+        <div class="archive-entry-head">
+          <h3 class="archive-entry-title entry-hint-parent">
+            <a class="archive-entry-link" href="{{ .Permalink }}">
+              {{ .Title | markdownify }}
+            </a>
+            {{- /* Tier 2: NEW badge (rendered server-side via front matter / date check) */ -}}
+            {{- $sevenDaysAgo := (now.AddDate 0 0 -7) }}
+            {{- if gt .Date.Unix $sevenDaysAgo.Unix }}
+            <span class="archive-new-badge">NEW</span>
+            {{- end }}
+          </h3>
+
+          {{- /* Tier 1: series badge */ -}}
+          {{- $seriesTerms := .GetTerms "series" }}
+          {{- if $seriesTerms }}
+          {{- range $seriesTerms }}
+          <a class="archive-series-badge" href="{{ .RelPermalink }}">📚 {{ .LinkTitle }}</a>
+          {{- end }}
+          {{- end }}
+        </div>
+
+        {{- /* Tier 1: excerpt preview */ -}}
+        {{- if .Summary }}
+        <div class="archive-excerpt">{{ .Summary | plainify | truncate 140 }}</div>
+        {{- end }}
+
+        <div class="archive-meta">
+          {{- partial "post_meta.html" . }}
+
+          {{- /* Tier 1: category + tag chips */ -}}
+          {{- if $cat }}
+          <span class="archive-chip archive-chip--cat" data-cat="{{ $catSlug }}">{{ $cat }}</span>
+          {{- end }}
+          {{- with .Params.tags }}
+          {{- range . }}
+          <span class="archive-chip archive-chip--tag">#{{ . }}</span>
+          {{- end }}
+          {{- end }}
+        </div>
+      </article>
+      {{- end }}
+      {{- end }}
+    </div>
+  </div>
+  {{- end }}
+</div>
+{{- end }}
+{{- end }}
+</div>
+
+{{- /* Tier 3: histogram is rendered by JS into #archive-histogram */ -}}
+<section id="archive-histogram" class="archive-histogram" aria-label="Post counts per month"></section>
+
+{{- /* Tier 3: client-side search + sort + histogram logic */ -}}
+<script src="/js/archive-search.js" defer></script>
+
+{{- end }}{{/* end main */}}
