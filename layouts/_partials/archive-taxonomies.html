@@ -1,0 +1,69 @@
+{{- /*
+    Taxonomy chip cloud — sits at the bottom of the archive page.
+    Renders site taxonomies (categories / tags / series) as clickable
+    chips with per-term counts, linking to PaperMod's taxonomy list
+    pages (/categories/, /tags/, /series/).
+
+    Moved here from the home profile block so the home stays a clean
+    PaperMod hero. Class names are archive-taxonomy* prefixed; they do
+    not collide with archive-search.js selectors (.archive-pill,
+    .archive-entry, ...).
+*/}}
+
+{{- $catTerms := site.Taxonomies.categories -}}
+{{- $tagTerms := site.Taxonomies.tags -}}
+{{- $seriesTerms := site.Taxonomies.series -}}
+{{- if or $catTerms $tagTerms $seriesTerms }}
+<div class="archive-taxonomies">
+    {{- if $catTerms }}
+    <section class="archive-taxonomies-section">
+        <h3 class="archive-taxonomies-title">📂 分类</h3>
+        <ul class="archive-taxonomies-list">
+            {{- range $name, $term := $catTerms }}
+            {{- $display := $term.Page.LinkTitle | default $name }}
+            <li>
+                <a class="archive-taxonomy-chip" href="{{ $term.Page.RelPermalink }}" aria-label="分类 {{ $display }}，共 {{ $term.Count }} 篇">
+                    <span class="archive-taxonomy-name">{{ $display }}</span>
+                    <span class="archive-taxonomy-count">{{ $term.Count }}</span>
+                </a>
+            </li>
+            {{- end }}
+        </ul>
+    </section>
+    {{- end }}
+
+    {{- if $tagTerms }}
+    <section class="archive-taxonomies-section">
+        <h3 class="archive-taxonomies-title">🏷️ 标签</h3>
+        <ul class="archive-taxonomies-list">
+            {{- range $name, $term := $tagTerms }}
+            {{- $display := $term.Page.LinkTitle | default $name }}
+            <li>
+                <a class="archive-taxonomy-chip" href="{{ $term.Page.RelPermalink }}" aria-label="标签 {{ $display }}，共 {{ $term.Count }} 篇">
+                    <span class="archive-taxonomy-name">{{ $display }}</span>
+                    <span class="archive-taxonomy-count">{{ $term.Count }}</span>
+                </a>
+            </li>
+            {{- end }}
+        </ul>
+    </section>
+    {{- end }}
+
+    {{- if $seriesTerms }}
+    <section class="archive-taxonomies-section">
+        <h3 class="archive-taxonomies-title">📚 系列</h3>
+        <ul class="archive-taxonomies-list">
+            {{- range $name, $term := $seriesTerms }}
+            {{- $display := $term.Page.LinkTitle | default $name }}
+            <li>
+                <a class="archive-taxonomy-chip" href="{{ $term.Page.RelPermalink }}" aria-label="系列 {{ $display }}，共 {{ $term.Count }} 篇">
+                    <span class="archive-taxonomy-name">{{ $display }}</span>
+                    <span class="archive-taxonomy-count">{{ $term.Count }}</span>
+                </a>
+            </li>
+            {{- end }}
+        </ul>
+    </section>
+    {{- end }}
+</div>
+{{- end }}

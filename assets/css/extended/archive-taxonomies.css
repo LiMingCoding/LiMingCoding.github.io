@@ -1,35 +1,27 @@
-/* Home taxonomy cloud: chip-style entry points under the profile block.
-   Visual language mirrors PaperMod's existing .terms-tags on
-   /categories/ and /tags/ pages so the home looks consistent with
-   those archives.
+/* Archive taxonomy cloud: chip-style browse-by-topic entry points at the
+   bottom of the archive page. Visual language mirrors PaperMod's existing
+   .terms-tags on /categories/ and /tags/ pages so the archive stays
+   consistent with those pages.
 
-   PaperMod sets `.main .profile { min-height: calc(100vh - header -
-   footer - gap*2) }` to give the profile a hero feel. With our taxonomy
-   block rendered as a sibling of .profile (see layouts/_partials/
-   index_profile.html), that min-height pushes the chips below the
-   fold on most screens. Override it here so the cloud is reachable
-   without scrolling. */
+   The three sections (分类 / 标签 / 系列) flow in a wrapping horizontal
+   row suited to the archive's full content width. */
 
-.main .profile {
-    min-height: auto;
-    padding: 1.5rem 0 1rem;
-}
-
-.home-taxonomies {
-    max-width: 480px;
-    margin: 1.75rem auto 0;
-    padding-top: 1.5rem;
+.archive-taxonomies {
+    margin: 2.5rem auto 0;
+    padding-top: 1.75rem;
     border-top: 1px dashed var(--border);
     display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 2rem;
 }
 
-.home-taxonomies-section {
+.archive-taxonomies-section {
+    flex: 1 1 260px;
     text-align: left;
 }
 
-.home-taxonomies-title {
+.archive-taxonomies-title {
     margin: 0 0 0.6rem;
     font-size: 0.85rem;
     font-weight: 600;
@@ -37,7 +29,7 @@
     letter-spacing: 0.05em;
 }
 
-.home-taxonomies-list {
+.archive-taxonomies-list {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
@@ -46,7 +38,7 @@
     list-style: none;
 }
 
-.home-taxonomy-chip {
+.archive-taxonomy-chip {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
@@ -61,18 +53,18 @@
     transition: background-color 0.15s, border-color 0.15s, transform 0.1s;
 }
 
-.home-taxonomy-chip:hover {
+.archive-taxonomy-chip:hover {
     background: var(--tertiary);
     border-color: var(--secondary);
     transform: translateY(-1px);
 }
 
-.home-taxonomy-name {
+.archive-taxonomy-name {
     /* keeps CJK and ASCII on the same baseline */
     white-space: nowrap;
 }
 
-.home-taxonomy-count {
+.archive-taxonomy-count {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -86,25 +78,25 @@
     font-weight: 600;
     line-height: 1;
 }
-/* Mobile: single-column, tighter chips so nothing overflows on 340px. */
+/* Mobile: stack the sections and tighten chips so nothing overflows on 340px. */
 @media screen and (max-width: 768px) {
-    .home-taxonomies {
-        max-width: 100%;
+    .archive-taxonomies {
+        flex-direction: column;
         padding: 1.25rem 1rem 0;
         margin-top: 1.25rem;
         gap: 1rem;
     }
-    .home-taxonomy-chip {
+    .archive-taxonomy-chip {
         font-size: 0.8rem;
         padding: 0.25rem 0.6rem;
     }
-    .home-taxonomy-count {
+    .archive-taxonomy-count {
         min-width: 1.3em;
         height: 1.3em;
     }
 }
 @media screen and (max-width: 340px) {
-    .home-taxonomy-chip {
+    .archive-taxonomy-chip {
         font-size: 0.75rem;
     }
 }

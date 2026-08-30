@@ -1,22 +1,9 @@
 {{- /*
     Override of PaperMod's _partials/index_profile.html.
 
-    Why: PaperMod's profile-mode home shows avatar + buttons and stops
-    there — no taxonomy entry points. We append a small "分类 / 标签 / 系列"
-    chip cloud below the profile so visitors can browse content by topic
-    from the home page. /categories/, /tags/ and /series/ already render
-    correctly via PaperMod's taxonomy.html; we only link to them.
-
-    Layout gotcha: PaperMod's .main .profile is `display: flex;
-    align-items: center`, so anything appended inside the .profile div
-    becomes a flex sibling of .profile_inner and sits *beside* the
-    centered avatar/title — not below it. The taxonomy block is rendered
-    here as a sibling of .profile (outside the flex parent) so it sits
-    full-width underneath the profile, in normal block flow.
-
-    The .profile div itself is reproduced verbatim from PaperMod so
-    `git diff themes/PaperMod/layouts/_partials/index_profile.html`
-    stays focused on the additions.
+    Kept only because the image-resize branch below differs slightly from
+    upstream. The home taxonomy chip cloud that used to live here now
+    lives on the archive page (see layouts/_partials/archive-taxonomies.html).
 */}}
 
 <div class="profile">
@@ -77,65 +64,3 @@
     </div>
     {{- end}}
 </div>
-
-{{/* BEGIN home taxonomy cloud — additions over upstream.
-     Rendered as a sibling of .profile so PaperMod's flex layout on
-     .main .profile does not put us beside the avatar. */}}
-{{- $catTerms := site.Taxonomies.categories -}}
-{{- $tagTerms := site.Taxonomies.tags -}}
-{{- $seriesTerms := site.Taxonomies.series -}}
-{{- if or $catTerms $tagTerms $seriesTerms }}
-<div class="home-taxonomies">
-    {{- if $catTerms }}
-    <section class="home-taxonomies-section">
-        <h3 class="home-taxonomies-title">📂 分类</h3>
-        <ul class="home-taxonomies-list">
-            {{- range $name, $term := $catTerms }}
-            {{- $display := $term.Page.LinkTitle | default $name }}
-            <li>
-                <a class="home-taxonomy-chip" href="{{ $term.Page.RelPermalink }}" aria-label="分类 {{ $display }}，共 {{ $term.Count }} 篇">
-                    <span class="home-taxonomy-name">{{ $display }}</span>
-                    <span class="home-taxonomy-count">{{ $term.Count }}</span>
-                </a>
-            </li>
-            {{- end }}
-        </ul>
-    </section>
-    {{- end }}
-
-    {{- if $tagTerms }}
-    <section class="home-taxonomies-section">
-        <h3 class="home-taxonomies-title">🏷️ 标签</h3>
-        <ul class="home-taxonomies-list">
-            {{- range $name, $term := $tagTerms }}
-            {{- $display := $term.Page.LinkTitle | default $name }}
-            <li>
-                <a class="home-taxonomy-chip" href="{{ $term.Page.RelPermalink }}" aria-label="标签 {{ $display }}，共 {{ $term.Count }} 篇">
-                    <span class="home-taxonomy-name">{{ $display }}</span>
-                    <span class="home-taxonomy-count">{{ $term.Count }}</span>
-                </a>
-            </li>
-            {{- end }}
-        </ul>
-    </section>
-    {{- end }}
-
-    {{- if $seriesTerms }}
-    <section class="home-taxonomies-section">
-        <h3 class="home-taxonomies-title">📚 系列</h3>
-        <ul class="home-taxonomies-list">
-            {{- range $name, $term := $seriesTerms }}
-            {{- $display := $term.Page.LinkTitle | default $name }}
-            <li>
-                <a class="home-taxonomy-chip" href="{{ $term.Page.RelPermalink }}" aria-label="系列 {{ $display }}，共 {{ $term.Count }} 篇">
-                    <span class="home-taxonomy-name">{{ $display }}</span>
-                    <span class="home-taxonomy-count">{{ $term.Count }}</span>
-                </a>
-            </li>
-            {{- end }}
-        </ul>
-    </section>
-    {{- end }}
-</div>
-{{- end }}
-{{/* END home taxonomy cloud */}}

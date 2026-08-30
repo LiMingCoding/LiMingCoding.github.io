@@ -117,6 +117,10 @@
 {{- /* Tier 3: histogram is rendered by JS into #archive-histogram */ -}}
 <section id="archive-histogram" class="archive-histogram" aria-label="Post counts per month"></section>
 
+{{- /* Browse-by-topic chip cloud (categories / tags / series), kept at the
+    bottom so the interactive entry list stays the star of the page. */ -}}
+{{- partial "archive-taxonomies.html" . }}
+
 {{- /* Tier 3: client-side search + sort + histogram logic */ -}}
 <script src="/js/archive-search.js" defer></script>
 

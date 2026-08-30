@@ -92,11 +92,11 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* --- home page taxonomy chips (our existing override) --- */
-/* NOTE: each chip is an <a.home-taxonomy-chip> wrapped in an <li> (see
-   layouts/_partials/index_profile.html), so nth-child must target the
+/* --- archive page taxonomy chips --- */
+/* NOTE: each chip is an <a.archive-taxonomy-chip> wrapped in an <li> (see
+   layouts/_partials/archive-taxonomies.html), so nth-child must target the
    <li> position — every <a> is :nth-child(1) of its own <li> otherwise. */
-.home-taxonomy-chip {
+.archive-taxonomy-chip {
     background: var(--code-bg);
     color: var(--primary);
     border-radius: 999px;
@@ -105,28 +105,28 @@
     transition: transform 0.15s, filter 0.2s, box-shadow 0.2s;
 }
 
-.home-taxonomies-list li:nth-child(7n+1) .home-taxonomy-chip { background: var(--tag-hue-0); color: var(--tag-fg-on-color); border-color: var(--tag-hue-0); }
-.home-taxonomies-list li:nth-child(7n+2) .home-taxonomy-chip { background: var(--tag-hue-1); color: var(--tag-fg-dark); border-color: var(--tag-hue-1); }
-.home-taxonomies-list li:nth-child(7n+3) .home-taxonomy-chip { background: var(--tag-hue-2); color: var(--tag-fg-on-color); border-color: var(--tag-hue-2); }
-.home-taxonomies-list li:nth-child(7n+4) .home-taxonomy-chip { background: var(--tag-hue-3); color: var(--tag-fg-dark); border-color: var(--tag-hue-3); }
-.home-taxonomies-list li:nth-child(7n+5) .home-taxonomy-chip { background: var(--tag-hue-4); color: var(--tag-fg-on-color); border-color: var(--tag-hue-4); }
-.home-taxonomies-list li:nth-child(7n+6) .home-taxonomy-chip { background: var(--tag-hue-5); color: var(--tag-fg-on-color); border-color: var(--tag-hue-5); }
-.home-taxonomies-list li:nth-child(7n)   .home-taxonomy-chip { background: var(--tag-hue-6); color: var(--tag-fg-on-color); border-color: var(--tag-hue-6); }
+.archive-taxonomies-list li:nth-child(7n+1) .archive-taxonomy-chip { background: var(--tag-hue-0); color: var(--tag-fg-on-color); border-color: var(--tag-hue-0); }
+.archive-taxonomies-list li:nth-child(7n+2) .archive-taxonomy-chip { background: var(--tag-hue-1); color: var(--tag-fg-dark); border-color: var(--tag-hue-1); }
+.archive-taxonomies-list li:nth-child(7n+3) .archive-taxonomy-chip { background: var(--tag-hue-2); color: var(--tag-fg-on-color); border-color: var(--tag-hue-2); }
+.archive-taxonomies-list li:nth-child(7n+4) .archive-taxonomy-chip { background: var(--tag-hue-3); color: var(--tag-fg-dark); border-color: var(--tag-hue-3); }
+.archive-taxonomies-list li:nth-child(7n+5) .archive-taxonomy-chip { background: var(--tag-hue-4); color: var(--tag-fg-on-color); border-color: var(--tag-hue-4); }
+.archive-taxonomies-list li:nth-child(7n+6) .archive-taxonomy-chip { background: var(--tag-hue-5); color: var(--tag-fg-on-color); border-color: var(--tag-hue-5); }
+.archive-taxonomies-list li:nth-child(7n)   .archive-taxonomy-chip { background: var(--tag-hue-6); color: var(--tag-fg-on-color); border-color: var(--tag-hue-6); }
 
-.home-taxonomy-chip:hover {
+.archive-taxonomy-chip:hover {
     /* override existing hover since we now have colored bg */
     transform: translateY(-2px);
     filter: brightness(1.1) saturate(1.2);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.home-taxonomy-count {
+.archive-taxonomy-count {
     /* keep count chip readable on colored backgrounds */
     background: rgba(255, 255, 255, 0.25) !important;
     color: #ffffff !important;
 }
-.home-taxonomies-list li:nth-child(7n+2) .home-taxonomy-count,
-.home-taxonomies-list li:nth-child(7n+4) .home-taxonomy-count {
+.archive-taxonomies-list li:nth-child(7n+2) .archive-taxonomy-count,
+.archive-taxonomies-list li:nth-child(7n+4) .archive-taxonomy-count {
     background: rgba(0, 0, 0, 0.15) !important;
     color: var(--tag-fg-dark) !important;
 }
