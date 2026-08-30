@@ -27,6 +27,7 @@ params:
   defaultTheme: auto
   ShowThemeToggleButton: true
   ShowReadingTime: true
+  ShowWordCount: true
   ShowShareButtons: true
   ShowPostNavLinks: true
   ShowBreadCrumbs: true
