@@ -125,6 +125,8 @@ pagination:
 theme: PaperMod
 
 permalinks:
-  posts: /posts/:slug/
+  # posts 用文件名做 slug：content/posts/foo-bar.md → /posts/foo-bar/
+  # 想用别的 URL，就在该文章 frontmatter 里加 slug: xxx（优先级高于文件名）
+  posts: /posts/:filename/
   page: /:slug/
   about: /about/

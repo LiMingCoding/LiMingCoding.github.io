@@ -2,7 +2,7 @@
 title: "{{ replace .File.ContentBaseName "-" " " | title }}"
 date: {{ .Date }}
 draft: true
-# slug: ""        # 自定义 URL slug，留空就按 title 生成（中文标题会被 URL-encode）
+# slug: ""        # 自定义 URL；留空则用文件名（content/posts/foo.md → /posts/foo/）
 # description: "" # SEO 摘要，会出现在 RSS 和 meta description
 # tags: []        # 标签，例如: [Python, 异步]
 # categories: []  # 分类，例如: [编程笔记]
