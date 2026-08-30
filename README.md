@@ -13,7 +13,8 @@
 | Hugo | extended `0.165.0` |
 | 主题 | PaperMod（git submodule 引入） |
 | 部署 | GitHub Actions → GitHub Pages |
-| 搜索 | Pagefind（构建后自动索引；CJK 分词 + 小节锚点直达） |
+| 搜索 | Pagefind（构建后自动索引；入口在 `/archives/?q=`，`/search/` 是 JS 跳转占位） |
+| 顶栏菜单 | 首页 / 归档 / 关于 / RSS（共 4 项，搜索不再占顶栏位） |
 
 ## 本地预览
 
@@ -73,11 +74,11 @@ hugo new posts/my-new-post.md
 
 | 路径 | 作用 |
 |---|---|
-| `hugo.yaml` | 站点配置（标题、菜单、主题参数） |
+| `hugo.yaml` | 站点配置（标题、`menu.main` 顶栏：`首页` / `归档` / `关于` / `RSS`，主题参数） |
 | `content/posts/*.md` | 博客文章 |
 | `content/about.md` | 关于页 |
 | `content/archives.md` | 归档页 |
-| `content/search.md` | 旧站内搜索页（现为跳转占位，导入 /archives/） |
+| `content/search.md` | 旧站内搜索页：`search-redirect` 布局，`/search/` 跳转到 `/archives/` 并透传 `?q=` |
 | `assets/css/extended/` | 自定义扩展样式 |
 | `static/img/` | 静态图片（头像、头图等） |
 | `themes/PaperMod/` | 主题（submodule，主题升级时拉取） |
