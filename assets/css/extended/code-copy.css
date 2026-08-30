@@ -1,0 +1,35 @@
+/* Always-visible copy button for code blocks.
+   PaperMod's default .copy-code is hover-only (display: none, shown via
+   div.highlight:hover / pre:hover) and is easily missed while reading a post.
+   This extended stylesheet (loaded after the theme CSS) overrides it so the
+   button is always visible, with hover/active micro-interactions. */
+
+.copy-code {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.25rem;
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    color: rgba(255, 255, 255, 0.92);
+    background: rgba(60, 60, 60, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius);
+    padding: 2px 8px;
+    font-size: 12px;
+    font-family: var(--sys-font-family, system-ui);
+    line-height: 1.4;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.15s, transform 0.1s;
+    z-index: 1;
+}
+
+.copy-code:hover {
+    background: rgba(80, 80, 80, 0.95);
+    transform: translateY(-1px);
+}
+
+.copy-code:active {
+    transform: translateY(0);
+}
