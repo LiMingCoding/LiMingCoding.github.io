@@ -71,7 +71,20 @@ params:
   ShowCodeCopyButtons: true
   ShowRssButtonInSiteCanal: true
   ShowAllCardsInArchive: false
-  comments: false
+  comments: true
+  giscus:
+    repo: "LiMingCoding/LiMingCoding.github.io"
+    repoId: "387329406"
+    category: "announcements"
+    categoryId: "DIC_kwDOFxYtfs4DEf3i"
+    mapping: "pathname"
+    strict: "0"
+    reactionsEnabled: "1"
+    emitMetadata: "0"
+    inputPosition: "top"
+    theme: "preferred_color_scheme"
+    lang: "zh-CN"
+    loading: "lazy"
   math: true      # 启用 KaTeX（行内 $...$ + 块级 $$...$$）
   mermaid: true   # 启用 Mermaid shortcode
 

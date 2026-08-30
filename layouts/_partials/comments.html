@@ -1,0 +1,24 @@
+{{- /*
+  Giscus comments via GitHub Discussions.
+  Renders only when the page sets comments: true in front matter or
+  .Site.Params.comments is true. Reads giscus config from .Site.Params.
+*/ -}}
+{{- if .Site.Params.giscus.repo -}}
+{{- $giscus := .Site.Params.giscus -}}
+<script src="https://giscus.app/client.js"
+        data-repo="{{ $giscus.repo }}"
+        data-repo-id="{{ $giscus.repoId }}"
+        data-category="{{ $giscus.category }}"
+        data-category-id="{{ $giscus.categoryId }}"
+        data-mapping="{{ default "pathname" $giscus.mapping }}"
+        data-strict="{{ default "0" $giscus.strict }}"
+        data-reactions-enabled="{{ default "1" $giscus.reactionsEnabled }}"
+        data-emit-metadata="{{ default "0" $giscus.emitMetadata }}"
+        data-input-position="{{ default "top" $giscus.inputPosition }}"
+        data-theme="{{ default "preferred_color_scheme" $giscus.theme }}"
+        data-lang="{{ default "zh-CN" $giscus.lang }}"
+        data-loading="{{ default "lazy" $giscus.loading }}"
+        crossorigin="anonymous"
+        async>
+</script>
+{{- end -}}

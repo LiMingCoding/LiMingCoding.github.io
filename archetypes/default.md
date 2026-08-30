@@ -9,6 +9,7 @@ draft: true
 # series: []      # 系列文章（多篇同系列），例如: ["Hugo折腾笔记"]；按发布时间升序显示
 ShowToc: true      # 是否显示右侧目录（默认开启；如不需要可注释掉）
 TocOpen: false     # 目录默认折叠；改成 true 让目录默认展开
+comments: true     # 是否显示评论区（giscus）
 # cover:
 #   image: ""     # 头图相对路径，例如: /img/post-foo.png
 #   alt: ""
