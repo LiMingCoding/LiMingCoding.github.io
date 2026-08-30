@@ -5,7 +5,6 @@
 
 baseURL: "https://limingcoding.github.io/"
 title: LiMing编程笔记
-titleCase: "first upper"
 
 defaultContentLanguage: zh-cn
 defaultContentLanguageInSubdir: false
