@@ -78,7 +78,7 @@
 }
 
 /* When a specific category is selected, hide posts that aren't in it. */
-.archive-radio[id^="archive-cat-"]:checked ~ .archive-list .archive-entry {
+.archive-radio[id^="archive-cat-"]:not(#archive-cat-all):checked ~ .archive-list .archive-entry {
     display: none;
 }
 #archive-cat-随笔:checked ~ .archive-list .archive-entry--cat-随笔,

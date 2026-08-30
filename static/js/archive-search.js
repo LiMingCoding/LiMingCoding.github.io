@@ -154,6 +154,161 @@
     });
   }
 
+  // ---------- RANDOM PICK ----------
+  // Weighted toward older posts so the button truly helps you "discover"
+  // something you wrote long ago and forgot about. Weight = (now - date).
+  // If you only have a few posts (<=3) just pick uniformly to avoid surprises.
+  const randomBtn = document.getElementById('archive-random-btn');
+
+  function pickRandom() {
+    const now = Date.now();
+    const candidates = entries.filter((el) => !el.dataset.hidden);
+    if (candidates.length === 0) return;
+
+    let pick;
+    if (candidates.length <= 3) {
+      pick = candidates[Math.floor(Math.random() * candidates.length)];
+    } else {
+      const weights = candidates.map((el) => {
+        const t = new Date(el.dataset.date || 0).getTime();
+        // Older => larger weight; clamp to >=1 day so same-day posts still have mass
+        return Math.max(now - t, 24 * 3600 * 1000);
+      });
+      const total = weights.reduce((a, b) => a + b, 0);
+      let r = Math.random() * total;
+      pick = candidates[candidates.length - 1];
+      for (let i = 0; i < candidates.length; i++) {
+        r -= weights[i];
+        if (r <= 0) { pick = candidates[i]; break; }
+      }
+    }
+
+    const link = pick.querySelector('.archive-entry-link');
+    if (link && link.href) {
+      // Tiny visual feedback: brief pulse on the picked card before navigating
+      pick.classList.add('archive-entry--picked');
+      window.setTimeout(() => { window.location.href = link.href; }, 180);
+    }
+  }
+
+  if (randomBtn) {
+    randomBtn.addEventListener('click', pickRandom);
+  }
+
+
+  // ---------- PAGINATOR ----------
+  // Client-side pagination: respect search/sort visibility, sync URL hash.
+  const PAGE_SIZE = 10;
+  const paginatorEl = document.getElementById('archive-paginator');
+  let currentPage = 1;
+
+  function visibleEntries() {
+    return entries.filter((el) => !el.dataset.hidden);
+  }
+
+  function readHashPage() {
+    const m = /(?:#|&)page=(\d+)/.exec(window.location.hash || '');
+    const n = m ? parseInt(m[1], 10) : 1;
+    return Number.isFinite(n) && n > 0 ? n : 1;
+  }
+
+  function writeHashPage(n) {
+    const target = '#page=' + n;
+    if (window.location.hash !== target) {
+      // replaceState avoids spamming browser history
+      try { history.replaceState(null, '', window.location.pathname + window.location.search + target); }
+      catch (_) { window.location.hash = target; }
+    }
+  }
+
+  function applyPage(page) {
+    const total = visibleEntries().length;
+    const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    currentPage = Math.min(Math.max(1, page), totalPages);
+
+    // Show only entries within the current page slice
+    const visible = visibleEntries();
+    const slice = visible.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+    const sliceSet = new Set(slice);
+    entries.forEach((el) => {
+      // Within current page slice AND not already hidden by search/filter => display
+      if (sliceSet.has(el)) {
+        el.style.display = '';
+      } else if (el.dataset.hidden) {
+        el.style.display = 'none';
+      } else {
+        // Outside page slice but still matches current filter => hide by page
+        el.style.display = 'none';
+      }
+    });
+
+    // Year/month grouping: hide headers whose entries are all hidden (page OR search)
+    document.querySelectorAll('.archive-month').forEach((m) => {
+      const any = Array.from(m.querySelectorAll('.archive-entry')).some((e) => e.style.display !== 'none');
+      m.style.display = any ? '' : 'none';
+    });
+    document.querySelectorAll('.archive-year').forEach((y) => {
+      const any = Array.from(y.querySelectorAll('.archive-month')).some((m) => m.style.display !== 'none');
+      y.style.display = any ? '' : 'none';
+    });
+
+    // Render the paginator control bar
+    if (paginatorEl) {
+      paginatorEl.innerHTML = '';
+      if (totalPages <= 1) return;  // single page: no controls
+
+      const mkBtn = (label, page, opts = {}) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'archive-page-btn' + (opts.current ? ' archive-page-btn--current' : '') + (opts.disabled ? ' archive-page-btn--disabled' : '');
+        b.textContent = label;
+        if (!opts.disabled && !opts.current) {
+          b.addEventListener('click', () => {
+            writeHashPage(page);
+            applyPage(page);
+            paginatorEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          });
+        }
+        return b;
+      };
+
+      paginatorEl.appendChild(mkBtn('« 上一页', currentPage - 1, { disabled: currentPage === 1 }));
+
+      // Compact page-number list: show first, last, current ±1
+      const numbers = new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
+      [...numbers].filter((n) => n >= 1 && n <= totalPages).sort((a, b) => a - b).reduce((prev, n) => {
+        if (prev !== null && n - prev > 1) {
+          const ell = document.createElement('span');
+          ell.className = 'archive-page-ellipsis';
+          ell.textContent = '…';
+          paginatorEl.appendChild(ell);
+        }
+        paginatorEl.appendChild(mkBtn(String(n), n, { current: n === currentPage }));
+        return n;
+      }, null);
+
+      paginatorEl.appendChild(mkBtn('下一页 »', currentPage + 1, { disabled: currentPage === totalPages }));
+
+      const summary = document.createElement('span');
+      summary.className = 'archive-page-summary';
+      summary.textContent = `第 ${currentPage} / ${totalPages} 页 · 共 ${total} 篇`;
+      paginatorEl.appendChild(summary);
+    }
+  }
+
+  // Hook paginator into existing search/sort flow.
+  // Easiest: re-run applyPage after every applySearch/sortEntries/hideEmptyMonths.
+  // We add it as a wrapper to applySearch without changing its body.
+  const _origApplySearch = applySearch;
+  applySearch = function (q) { _origApplySearch(q); applyPage(1); writeHashPage(1); };
+  const _origSortEntries = sortEntries;
+  sortEntries = function (m) { _origSortEntries(m); applyPage(currentPage); };
+  const _origHideEmptyMonths = hideEmptyMonths;
+  hideEmptyMonths = function () { _origHideEmptyMonths(); };
+
+  window.addEventListener('hashchange', () => applyPage(readHashPage()));
+
   // ---------- INIT ----------
   buildHistogram();
+  applyPage(readHashPage());
 })();

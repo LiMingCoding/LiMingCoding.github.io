@@ -19,8 +19,17 @@
     <option value="reading-asc">阅读时长 短→长</option>
     <option value="reading-desc">阅读时长 长→短</option>
   </select>
+
+  <button type="button"
+          id="archive-random-btn"
+          class="archive-random-btn"
+          title="随机挑一篇（按发布时间加权，越老的文章越容易被抽到）"
+          aria-label="随机挑一篇文章">
+    🎲 抽一篇旧的看看
+  </button>
 </div>
 
 <div id="archive-no-results" class="archive-no-results" hidden>
   没找到匹配的文章。换个关键词试试？
 </div>
+<nav id="archive-paginator" class="archive-paginator" aria-label="分页"></nav>

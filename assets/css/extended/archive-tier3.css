@@ -38,6 +38,40 @@
     cursor: pointer;
 }
 
+/* Random pick button (Tier 3) */
+.archive-random-btn {
+    padding: 0.5rem 0.95rem;
+    font-size: 0.9em;
+    color: var(--primary);
+    background: var(--entry);
+    border: 1px solid var(--border);
+    border-radius: var(--radius, 8px);
+    cursor: pointer;
+    transition: transform 0.1s ease, border-color 0.15s ease, background 0.15s ease;
+    white-space: nowrap;
+}
+
+.archive-random-btn:hover {
+    border-color: var(--secondary);
+    background: var(--secondary);
+    color: #fff;
+}
+
+.archive-random-btn:active {
+    transform: scale(0.97);
+}
+
+/* Brief highlight on the entry that was randomly picked, before navigation */
+.archive-entry--picked {
+    animation: archive-picked-flash 0.18s ease-out;
+}
+
+@keyframes archive-picked-flash {
+    0%   { background: rgba(245, 158, 11, 0); }
+    50%  { background: rgba(245, 158, 11, 0.25); }
+    100% { background: rgba(245, 158, 11, 0); }
+}
+
 .archive-no-results {
     padding: 1.5rem;
     text-align: center;
@@ -107,4 +141,57 @@
     font-variant-numeric: tabular-nums;
     text-align: right;
     flex-shrink: 0;
+}
+
+/* ===== Paginator (Tier 3) ===== */
+.archive-paginator {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: center;
+    justify-content: center;
+    margin: 1.5rem 0 0.5rem;
+    padding: 0.6rem;
+    border-top: 1px solid var(--border);
+}
+
+.archive-page-btn {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.85em;
+    color: var(--primary);
+    background: var(--entry);
+    border: 1px solid var(--border);
+    border-radius: var(--radius, 6px);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.archive-page-btn:hover:not(.archive-page-btn--disabled):not(.archive-page-btn--current) {
+    border-color: var(--secondary);
+    color: var(--secondary);
+}
+
+.archive-page-btn--current {
+    color: #fff;
+    background: var(--secondary);
+    border-color: var(--secondary);
+    cursor: default;
+}
+
+.archive-page-btn--disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.archive-page-ellipsis {
+    color: var(--secondary);
+    padding: 0 0.25rem;
+}
+
+.archive-page-summary {
+    flex: 1 1 100%;
+    text-align: center;
+    margin-top: 0.4rem;
+    font-size: 0.8em;
+    color: var(--secondary);
 }
