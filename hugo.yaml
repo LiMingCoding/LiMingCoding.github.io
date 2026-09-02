@@ -82,7 +82,7 @@ params:
   author: LiMingCoding
 
   profileMode:
-    enabled: true
+    enabled: false
     title: "LiMing笔记"
     subtitle: "技术学习笔记 · 实战 · 调优"
     imageUrl: "/img/avatar.svg"
