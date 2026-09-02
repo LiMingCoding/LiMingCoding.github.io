@@ -1,10 +1,10 @@
 # =============================================================
-#  LiMing编程笔记 — Hugo 站点配置
+#  LiMing笔记 — Hugo 站点配置
 #  格式: hugo.yaml；基于 PaperMod 主题推荐写法。
 # =============================================================
 
 baseURL: "https://limingcoding.github.io/"
-title: LiMing编程笔记
+title: LiMing笔记
 
 defaultContentLanguage: zh-cn
 defaultContentLanguageInSubdir: false
@@ -18,7 +18,7 @@ languages:
     languageName: 简体中文
     weight: 1
     languageCode: zh-CN
-    title: "LiMing编程笔记"
+    title: "LiMing笔记"
     params:
       description: "技术学习笔记 · 实战 · 调优"
 
@@ -83,7 +83,7 @@ params:
 
   profileMode:
     enabled: true
-    title: "LiMing编程笔记"
+    title: "LiMing笔记"
     subtitle: "技术学习笔记 · 实战 · 调优"
     imageUrl: "/img/avatar.svg"
     imageWidth: 120
@@ -103,7 +103,7 @@ params:
       url: "https://github.com/LiMingCoding"
 
   homeInfoParams:
-    Title: "欢迎来到 LiMing编程笔记 👋"
+    Title: "欢迎来到 LiMing笔记 👋"
     Content: |
       这里记录我在学习中整理的编程笔记、踩坑经验和工具使用心得。
       偏向实战、调优思路，目标是写完就能用上。

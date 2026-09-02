@@ -1,4 +1,4 @@
-# LiMing编程笔记
+# LiMing笔记
 
 > 个人技术博客 — Hugo + PaperMod，托管于 GitHub Pages。
 
