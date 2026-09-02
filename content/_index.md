@@ -1,3 +1,3 @@
 ---
-title: "LiMing编程笔记"
+title: "LiMing笔记"
 ---

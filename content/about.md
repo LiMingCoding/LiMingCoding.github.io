@@ -1,6 +1,6 @@
 ---
 title: 关于
-description: 关于 LiMing编程笔记 与作者 LiMingCoding。
+description: 关于 LiMing笔记 与作者 LiMingCoding。
 slug: about
 layout: single
 ShowBreadCrumbs: false
@@ -20,6 +20,7 @@ ShowTOC: false
 - Python / Rust
 - Web / 前端
 - 系统与运维
+- PVE 服务器管理
 
 ## 联系我
 
