@@ -1,23 +1,43 @@
 {{- /*
-    Taxonomy chip cloud — sits at the bottom of the archive page.
+    Taxonomy chip cloud — sits at the top of the archive page.
+
     Renders site taxonomies (categories / tags / series) as clickable
     chips with per-term counts, linking to PaperMod's taxonomy list
     pages (/categories/, /tags/, /series/).
 
-    Moved here from the home profile block so the home stays a clean
-    PaperMod hero. Class names are archive-taxonomy* prefixed; they do
-    not collide with archive-search.js selectors (.archive-pill,
-    .archive-entry, ...).
+    Layout strategy (v2):
+      - All three sections wrap in native <details>/<summary>
+      - 分类 (categories) and 系列 (series) default open — small lists
+      - 标签 (tags) default closed + split into:
+          * common:  count >= 2 (always visible when section is open)
+          * rare:    count == 1 (hidden behind a CSS-only checkbox toggle)
+      - Zero JS. State persists per-page-load via checkbox.
+
+    Class names are archive-taxonomy* prefixed; they do not collide with
+    archive-search.js selectors (.archive-pill, .archive-entry, ...).
 */}}
 
 {{- $catTerms := site.Taxonomies.categories -}}
 {{- $tagTerms := site.Taxonomies.tags -}}
 {{- $seriesTerms := site.Taxonomies.series -}}
 {{- if or $catTerms $tagTerms $seriesTerms }}
+
+{{- /* For tags, split into common (>=2 posts) and rare (==1 post) by count. */ -}}
+{{- $tagCommon := dict -}}
+{{- $tagRare := dict -}}
+{{- range $name, $term := $tagTerms -}}
+  {{- if ge $term.Count 2 -}}
+    {{- $tagCommon = merge $tagCommon (dict $name $term) -}}
+  {{- else -}}
+    {{- $tagRare = merge $tagRare (dict $name $term) -}}
+  {{- end -}}
+{{- end -}}
+{{- $rareCount := len $tagRare -}}
+
 <div class="archive-taxonomies">
     {{- if $catTerms }}
-    <section class="archive-taxonomies-section">
-        <h3 class="archive-taxonomies-title">📂 分类</h3>
+    <details class="archive-taxonomies-section" open>
+        <summary class="archive-taxonomies-title">📂 分类</summary>
         <ul class="archive-taxonomies-list">
             {{- range $name, $term := $catTerms }}
             {{- $display := $term.Page.LinkTitle | default $name }}
@@ -29,14 +49,17 @@
             </li>
             {{- end }}
         </ul>
-    </section>
+    </details>
     {{- end }}
 
     {{- if $tagTerms }}
-    <section class="archive-taxonomies-section">
-        <h3 class="archive-taxonomies-title">🏷️ 标签</h3>
+    <details class="archive-taxonomies-section">
+        <summary class="archive-taxonomies-title">
+            🏷️ 标签
+            <span class="archive-taxonomies-summary-count">({{ len $tagTerms }})</span>
+        </summary>
         <ul class="archive-taxonomies-list">
-            {{- range $name, $term := $tagTerms }}
+            {{- range $name, $term := $tagCommon }}
             {{- $display := $term.Page.LinkTitle | default $name }}
             <li>
                 <a class="archive-taxonomy-chip" href="{{ $term.Page.RelPermalink }}" aria-label="标签 {{ $display }}，共 {{ $term.Count }} 篇">
@@ -46,12 +69,42 @@
             </li>
             {{- end }}
         </ul>
-    </section>
+        {{- if and (gt $rareCount 0) (gt (len $tagCommon) 0) }}
+        {{- /* CSS-only toggle: checkbox + label controls visibility of .archive-rare-list */ -}}
+        <input type="checkbox" id="archive-show-rare-tags" class="archive-show-rare-toggle">
+        <label for="archive-show-rare-tags" class="archive-show-rare-label archive-show-rare-label--show">显示全部 {{ $rareCount }} 个低频标签</label>
+        <label for="archive-show-rare-tags" class="archive-show-rare-label archive-show-rare-label--hide">收起低频标签</label>
+        <ul class="archive-taxonomies-list archive-rare-list">
+            {{- range $name, $term := $tagRare }}
+            {{- $display := $term.Page.LinkTitle | default $name }}
+            <li>
+                <a class="archive-taxonomy-chip archive-taxonomy-chip--rare" href="{{ $term.Page.RelPermalink }}" aria-label="标签 {{ $display }}，共 {{ $term.Count }} 篇">
+                    <span class="archive-taxonomy-name">{{ $display }}</span>
+                    <span class="archive-taxonomy-count">{{ $term.Count }}</span>
+                </a>
+            </li>
+            {{- end }}
+        </ul>
+        {{- else if gt $rareCount 0 }}
+        {{- /* No common tags — show all rare tags without toggle */ -}}
+        <ul class="archive-taxonomies-list">
+            {{- range $name, $term := $tagRare }}
+            {{- $display := $term.Page.LinkTitle | default $name }}
+            <li>
+                <a class="archive-taxonomy-chip" href="{{ $term.Page.RelPermalink }}" aria-label="标签 {{ $display }}，共 {{ $term.Count }} 篇">
+                    <span class="archive-taxonomy-name">{{ $display }}</span>
+                    <span class="archive-taxonomy-count">{{ $term.Count }}</span>
+                </a>
+            </li>
+            {{- end }}
+        </ul>
+        {{- end }}
+    </details>
     {{- end }}
 
     {{- if $seriesTerms }}
-    <section class="archive-taxonomies-section">
-        <h3 class="archive-taxonomies-title">📚 系列</h3>
+    <details class="archive-taxonomies-section" open>
+        <summary class="archive-taxonomies-title">📚 系列</summary>
         <ul class="archive-taxonomies-list">
             {{- range $name, $term := $seriesTerms }}
             {{- $display := $term.Page.LinkTitle | default $name }}
@@ -63,7 +116,7 @@
             </li>
             {{- end }}
         </ul>
-    </section>
+    </details>
     {{- end }}
 </div>
 {{- end }}
